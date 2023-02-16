@@ -7,7 +7,7 @@ _When it's properly used it's almost invincible_"
 
 ## Development notes
 
-### Related sites with possibly cood reference material
+### Related sites with possibly good reference material
 
 * [PHP: SessionHandlerInterface - Manual](https://www.php.net/manual/en/class.sessionhandlerinterface.php)
 * [1ma/RedisSessionHandler: An alternative Redis session handler for PHP featuring per-session locking and session fixation protection](https://github.com/1ma/RedisSessionHandler)
