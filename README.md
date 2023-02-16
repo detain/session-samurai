@@ -7,6 +7,67 @@ _When it's properly used it's almost invincible_"
 
 ## Development notes
 
+### Session Lifecycle Handler Calls
+
+#### Open, write and close
+session_start();
+                      # SessionHandler::open('C:\\server\\temp', 'PHPSESSID')
+                      # SessionHandler::create_sid()
+                      # SessionHandler::read('f57cvufkbu6qgfiqkksuagl257')
+$_SESSION['foo'] = 'bar';
+session_write_close();
+                      # SessionHandler::write('f57cvufkbu6qgfiqkksuagl257', 'foo|s:3:"bar";')
+                      # SessionHandler::close()
+
+#### Resume, read and close
+session_start();
+                      # SessionHandler::open('C:\\server\\temp', 'PHPSESSID')
+                      # SessionHandler::read('f57cvufkbu6qgfiqkksuagl257')
+echo $_SESSION['foo'];
+    bar
+session_write_close();
+                      # SessionHandler::write('f57cvufkbu6qgfiqkksuagl257', 'foo|s:3:"bar";')
+                      # SessionHandler::close()
+
+#### Open, regenerate and write
+session_start();
+                      # SessionHandler::open('C:\\server\\temp', 'PHPSESSID')
+                      # SessionHandler::read('f57cvufkbu6qgfiqkksuagl257')
+session_regenerate_id();
+                      # SessionHandler::create_sid()
+echo $_SESSION['foo'];
+    bar
+session_write_close();
+                      # SessionHandler::write('dp1srap0fn9isne4na6mm83mt4', 'foo|s:3:"bar";')
+                      # SessionHandler::close()
+
+#### Session reset
+session_start()
+                      # SessionHandler::open('C:\\server\\temp', 'PHPSESSID')
+                      # SessionHandler::read('ui4odihluc5nkc1oh4gftlgtd7')
+session_reset()
+                      # SessionHandler::open('C:\\server\\temp', 'PHPSESSID')
+                      # SessionHandler::read('ui4odihluc5nkc1oh4gftlgtd7')
+session_write_close();
+                      # SessionHandler::write('ui4odihluc5nkc1oh4gftlgtd7', 'foo|s:3:"bar";')
+                      # SessionHandler::close()
+
+#### Custom session ID
+session_id(sha1('my custom id'));
+session_start();
+                      # SessionHandler::open('C:\\server\\temp', 'PHPSESSID')
+                      # SessionHandler::read('b9361e543a36b9318334f618c3645ae270f773b6')
+session_write_close();
+                      # SessionHandler::write('b9361e543a36b9318334f618c3645ae270f773b6', 'a:0:{}')
+                      # SessionHandler::close()
+### Destruction
+session_start();
+                      # SessionHandler::open('C:\\server\\temp', 'PHPSESSID')
+                      # SessionHandler::read('dp1srap0fn9isne4na6mm83mt4')
+session_destroy();
+                      # SessionHandler::destroy('dp1srap0fn9isne4na6mm83mt4')
+                      # SessionHandler::close()
+
 ### Related sites with possibly good reference material
 
 * [PHP: SessionHandlerInterface - Manual](https://www.php.net/manual/en/class.sessionhandlerinterface.php)
