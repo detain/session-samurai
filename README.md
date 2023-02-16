@@ -1,5 +1,5 @@
 # Session Samurai 🥷
-Universal high-speed asynchronous (non-blocking) PHP SessionHandlerInterface implementation supporting shared memory, redis, memcached, mysqli, pdo, mongodb, and local file storage.
+Universal high-speed asynchronous (non-blocking) SessionHandlerInterface implementation for PHP supporting shared memory, redis, memcached, mysqli, pdo, mongodb, and local file storage.
  
 "_Session handling is like a sword fight_<br>
 _You must think first before you move_<br>
