@@ -1,0 +1,21 @@
+{
+    "name": "detain/session-samurai",
+    "description": "🥷 Universal high-speed asynchronous (non-blocking) SessionHandlerInterface implementation for PHP supporting shared memory, redis, memcached, mysqli, pdo, mongodb, and local file storage.",
+    "type": "library",
+    "require": {
+        "ext-session": "*"
+    },
+    "license": "GPL-3.0",
+    "autoload": {
+        "psr-4": {
+            "Detain\\SessionSamurail\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Joe Huss",
+            "email": "detain@interserver.net"
+        }
+    ],
+    "minimum-stability": "dev"
+}
