@@ -16,6 +16,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": ">=6.0,<8@stable",
+        "squizlabs/php_codesniffer": "*",
+        "friendsofphp/php-cs-fixer": "*",
 	    "phpstan/phpstan": "*"
     },
     "autoload": {
@@ -38,5 +40,8 @@
             "@phpcs",
             "@phpstan"
         ]
+    },
+    "config": {
+        "sort-packages": true
     }
 }
