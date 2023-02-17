@@ -1,6 +1,5 @@
 # Session Samurai 🥷
 
-[![Build Status](https://travis-ci.com/detain/session-samurai.png?branch=master)](https://travis-ci.com/detain/session-samurai)
 
 Universal high-speed asynchronous (non-blocking) SessionHandlerInterface implementation for PHP supporting Semaphores, Mysqli, Redis, SQLite3, Symfony/Cache, WinCache, PhpFastCache, PHP-Cache, PDO, Memcached, FlySystem Filesystem, Illuminate, APCu, APC, OpCache, InfluxDB, WinCache, MongoDb and local file storage.
 
