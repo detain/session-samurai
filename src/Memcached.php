@@ -13,7 +13,7 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     /**
     * @var string The namespace prefix to prepend to session IDs
     */
-    protected $prefix;
+    protected $prefix = '';
 
     /**
     * Create new memcached session save handler
@@ -32,7 +32,8 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     * @param string $name
     * @return boolean
     */
-    public function open(string $path, string $name): bool
+    //public function open(string $path, string $name): bool
+    public function open($path, $name)
     {
         // Note: session save path is not used
         $this->sessionName = $name;
@@ -58,7 +59,8 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     * @return string|false
     */
     #[\ReturnTypeWillChange]
-    public function read(string $id) //: string|false
+    public function read($id) //: string|false
+    //public function read(string $id) //: string|false
     {
         $_SESSION = json_decode((string) $this->memcached->get($this->prefix . $id), true);
         if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null) {
@@ -74,7 +76,8 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     * @param string $data
     * @return boolean
     */
-    public function write(string $id, string $data): bool
+    public function write($id, $data)
+    //public function write(string $id, string $data): bool
     {
         // note: $data is not used as it has already been serialised by PHP,
         // so we use $_SESSION which is an unserialised version of $data.
@@ -88,7 +91,8 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     * @param string $id
     * @return boolean
     */
-    public function destroy(string $id): bool
+    public function destroy($id)
+    //public function destroy(string $id): bool
     {
         return (bool) $this->memcached->delete($this->prefix . $id);
     }
@@ -100,7 +104,8 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     * @return int|false true successs false failure?
     */
     #[\ReturnTypeWillChange]
-    public function gc(int $max_lifetime) //: int|false
+    public function gc($max_lifetime) //: int|false
+    //public function gc(int $max_lifetime) //: int|false
     {
         // let memcached handle this with expiration time
         $this->expire = $max_lifetime;
@@ -112,7 +117,8 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     *
     * @return string
     */
-    public function create_sid(): string
+    public function create_sid()
+    //public function create_sid(): string
     {
         // available since PHP 5.5.1
         // invoked internally when a new session id is needed
@@ -131,7 +137,8 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     * @param string $data
     * @return bool
     */
-    public function updateTimestamp(string $id, string $data): bool
+    public function updateTimestamp($id, $data)
+    //public function updateTimestamp(string $id, string $data): bool
     {
         // implements SessionUpdateTimestampHandlerInterface::validateId()
         // available since PHP 7.0
@@ -145,7 +152,8 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     * @param string $id
     * @return bool
     */
-    public function validateId(string $id): bool
+    public function validateId($id)
+    //public function validateId(string $id): bool
     {
         // implements SessionUpdateTimestampHandlerInterface::validateId()
         // available since PHP 7.0
