@@ -4,7 +4,10 @@ namespace Detain\SessionSamurai;
 
 class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    protected $memcached;
+    /**
+    * @var \Memcached
+    */
+    protected \Memcached $memcached;
 
     /**
      * Create new memcached session save handler
@@ -99,6 +102,11 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
         return $this->memcached->set("sessions/{$id}", json_encode($_SESSION), $this->lifetime);
     }
 
+    /**
+    * Creates a new SID
+    *
+    * @return string
+    */
     public function create_sid(): string
     {
         // available since PHP 5.5.1
@@ -106,6 +114,13 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
         // no parameter is needed and return value should be the new session id created
     }
 
+    /**
+    * Update the session timestamp
+    *
+    * @param string $id
+    * @param string $data
+    * @return bool
+    */
     public function updateTimestamp(string $id, string $data): bool
     {
         // implements SessionUpdateTimestampHandlerInterface::validateId()
@@ -113,6 +128,12 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
         // return value should be true for success or false for failure
     }
 
+    /**
+    * Verifies a session id
+    *
+    * @param string $id
+    * @return bool
+    */
     public function validateId(string $id): bool
     {
         // implements SessionUpdateTimestampHandlerInterface::validateId()

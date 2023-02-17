@@ -4,59 +4,109 @@ namespace Detain\SessionSamurai;
 
 class PDO implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private $savePath;
+    /**
+    * @var \Memcached
+    */
+    protected \Memcached $memcached;
 
+    /**
+     * Create new memcached session save handler
+     * @param \Memcached $memcached
+     */
+    public function __construct(\Memcached $memcached)
+    {
+        $this->memcached = $memcached;
+    }
+
+    /**
+     * Close session
+     *
+     * @return boolean
+     */
     public function close(): bool
     {
         // return value should be true for success or false for failure
         return true;
     }
 
+
+    /**
+     * Destroy session
+     *
+     * @param string $id
+     * @return boolean
+     */
     public function destroy(string $id): bool
     {
-        $file = "$this->savePath/sess_$id";
-        if (file_exists($file)) {
-            unlink($file);
-        }
-        // return value should be true for success or false for failure
-        return true;
+        return $this->memcached->delete("sessions/{$id}");
     }
 
+    /**
+     * Garbage collect. Memcache handles this with expiration times.
+     *
+     * @param int $maxlifetime
+     * @return int|false true successs false failure?
+     */
     #[\ReturnTypeWillChange]
     public function gc(int $max_lifetime) //: int|false
     {
-        foreach (glob("$this->savePath/sess_*") as $file) {
-            if (filemtime($file) + $max_lifetime < time() && file_exists($file)) {
-                unlink($file);
-            }
-        }
-        // return value should be true for success or false for failure
+        // let memcached handle this with expiration time
         return true;
     }
 
+    /**
+     * Open session
+     *
+     * @param string $savePath
+     * @param string $name
+     * @return boolean
+     */
     public function open(string $path, string $name): bool
     {
-        $this->savePath = $savePath;
-        if (!is_dir($this->savePath)) {
-            mkdir($this->savePath, 0777);
-        }
-        // return value should be true for success or false for failure
+        // Note: session save path is not used
+        $this->sessionName = $name;
+        $this->lifetime = ini_get('session.gc_maxlifetime');
         return true;
     }
 
+    /**
+     * Read session data
+     *
+     * @param string $id
+     * @return string|false
+     */
     #[\ReturnTypeWillChange]
     public function read(string $id) //: string|false
     {
-        // return value should be the session data or an empty string
-        return (string)@file_get_contents("$this->savePath/sess_$id");
+        $_SESSION = json_decode($this->memcached->get("sessions/{$id}"), true);
+
+        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null)
+        {
+            return session_encode();
+        }
+
+        return '';
     }
 
+    /**
+     * Write session data
+     *
+     * @param string $id
+     * @param string $data
+     * @return boolean
+     */
     public function write(string $id, string $data): bool
     {
-        // return value should be true for success or false for failure
-        return file_put_contents("$this->savePath/sess_$id", $data) === false ? false : true;
+        // note: $data is not used as it has already been serialised by PHP,
+        // so we use $_SESSION which is an unserialised version of $data.
+        return $this->memcached->set("sessions/{$id}", json_encode($_SESSION), $this->lifetime);
     }
 
+    /**
+    * Creates a new SID
+    *
+    * @return string
+    */
     public function create_sid(): string
     {
         // available since PHP 5.5.1
@@ -64,6 +114,13 @@ class PDO implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpda
         // no parameter is needed and return value should be the new session id created
     }
 
+    /**
+    * Update the session timestamp
+    *
+    * @param string $id
+    * @param string $data
+    * @return bool
+    */
     public function updateTimestamp(string $id, string $data): bool
     {
         // implements SessionUpdateTimestampHandlerInterface::validateId()
@@ -71,6 +128,12 @@ class PDO implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpda
         // return value should be true for success or false for failure
     }
 
+    /**
+    * Verifies a session id
+    *
+    * @param string $id
+    * @return bool
+    */
     public function validateId(string $id): bool
     {
         // implements SessionUpdateTimestampHandlerInterface::validateId()
