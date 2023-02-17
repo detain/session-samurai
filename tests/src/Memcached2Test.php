@@ -101,3 +101,5 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->memcached->set($this->prefix . $sessionId, $data);
 
         $this->assertTrue($this->handler->updateTimestamp($sessionId, $data));
+	}
+}
