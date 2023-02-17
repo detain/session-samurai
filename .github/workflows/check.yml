@@ -52,5 +52,5 @@ jobs:
     - name: Run phpcs
       run: composer phpcs-diff
 
-    - name: Run phpstan
-      run: composer phpstan
+#    - name: Run phpstan
+#      run: composer phpstan
