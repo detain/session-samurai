@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.com/detain/session-samurai.png?branch=master)](https://travis-ci.com/detain/session-samurai)
 
-Universal high-speed asynchronous (non-blocking) SessionHandlerInterface implementation for PHP supporting shared memory, redis, memcached, mysqli, pdo, mongodb, and local file storage.
- 
+Universal high-speed asynchronous (non-blocking) SessionHandlerInterface implementation for PHP supporting Semaphores, Mysqli, Redis, SQLite3, Symfony/Cache, WinCache, PhpFastCache, PHP-Cache, PDO, Memcached, FlySystem Filesystem, Illuminate, APCu, APC, OpCache, InfluxDB, WinCache, MongoDb and local file storage.
+
 "_Session handling is like a sword fight_<br>
 _You must think first before you move_<br>
 _When it's properly used it's almost invincible_"
@@ -27,7 +27,7 @@ $memcached->addServer('localhost', 11211);
 $handler = new Detain\SessionSamurai\Memcached($memcached);  // register handler (PHP 5.3 compatible)
 
 session_set_save_handler(
-    array($handler, 'open'),    
+    array($handler, 'open'),
     array($handler, 'close'),
     array($handler, 'read'),
     array($handler, 'write'),
