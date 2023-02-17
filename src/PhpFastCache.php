@@ -1,4 +1,6 @@
 <?php
+
+namespace Detain\SessionSamurai;
 use Phpfastcache\CacheManager;
 use Phpfastcache\Config\ConfigurationOption;
 use Phpfastcache\Core\Item\ExtendedCacheItemInterface;
@@ -6,7 +8,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionHandlerInter
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionIdInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionUpdateTimestampHandlerInterface;
 
-class PhpCacheSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class PhpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $cache;
 

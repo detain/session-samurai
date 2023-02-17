@@ -1,6 +1,8 @@
 <?php
 
-class APCu implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface {
+namespace Detain\SessionSamurai;
+
+class APCu implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
 
     private $ttl;
 

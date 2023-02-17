@@ -1,6 +1,8 @@
 <?php
 
-class OpCache implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface {
+namespace Detain\SessionSamurai;
+
+class OpCache implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
     private $sessionId;
 
     public function __construct() {

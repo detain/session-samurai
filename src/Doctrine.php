@@ -1,5 +1,7 @@
 <?php
 
+namespace Detain\SessionSamurai;
+
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;

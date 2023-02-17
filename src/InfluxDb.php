@@ -1,12 +1,14 @@
 <?php
 
+namespace Detain\SessionSamurai;
+
 use InfluxDB\Client;
 use InfluxDB\Point;
 use SessionHandlerInterface;
 use SessionIdInterface;
 use SessionUpdateTimestampHandlerInterface;
 
-class InfluxDBSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class InfluxDBSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $client;
     protected $database;

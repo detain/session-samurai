@@ -1,11 +1,13 @@
 <?php
 
+namespace Detain\SessionSamurai;
+
 use League\Flysystem\FilesystemInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
 use SessionUpdateTimestampHandlerInterface;
 
-class FlySystem implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class FlySystem implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $filesystem;
     protected $path;

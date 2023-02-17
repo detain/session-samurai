@@ -1,11 +1,13 @@
 <?php
 
+namespace Detain\SessionSamurai;
+
 use Cache\Cache;
 use SessionHandlerInterface;
 use SessionIdInterface;
 use SessionUpdateTimestampHandlerInterface;
 
-class CacheSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class CacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $cache;
     protected $prefix;

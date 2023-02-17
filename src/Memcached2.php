@@ -1,5 +1,8 @@
 <?php
-class Memcached2
+
+namespace Detain\SessionSamurai;
+
+class Memcached2 implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     /**
     * @var \Memcached

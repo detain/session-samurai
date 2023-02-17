@@ -5,101 +5,106 @@ namespace Detain\SessionSamurai;
 class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     /**
-    * @var \Memcached
+    * @var Memcached The memcached object
     */
-    protected \Memcached $memcached;
+    protected $memcached;
+    protected $sessionName;
+    protected $expire;
+    /**
+    * @var string The namespace prefix to prepend to session IDs
+    */
+    protected $prefix;
 
     /**
-     * Create new memcached session save handler
-     * @param \Memcached $memcached
-     */
-    public function __construct(\Memcached $memcached)
+    * Create new memcached session save handler
+    * @param \Memcached $memcached
+    */
+    public function __construct(\Memcached $memcached, string $prefix = '')
     {
         $this->memcached = $memcached;
+        $this->prefix = $prefix;
     }
 
     /**
-     * Close session
-     *
-     * @return boolean
-     */
+    * Open session
+    *
+    * @param string $savePath
+    * @param string $name
+    * @return boolean
+    */
+    public function open(string $path, string $name): bool
+    {
+        // Note: session save path is not used
+        $this->sessionName = $name;
+        $this->expire = ini_get('session.gc_maxlifetime');
+        return true;
+    }
+
+    /**
+    * Close session
+    *
+    * @return boolean
+    */
     public function close(): bool
     {
         // return value should be true for success or false for failure
         return true;
     }
 
-
     /**
-     * Destroy session
-     *
-     * @param string $id
-     * @return boolean
-     */
-    public function destroy(string $id): bool
-    {
-        return $this->memcached->delete("sessions/{$id}");
-    }
-
-    /**
-     * Garbage collect. Memcache handles this with expiration times.
-     *
-     * @param int $maxlifetime
-     * @return int|false true successs false failure?
-     */
-    #[\ReturnTypeWillChange]
-    public function gc(int $max_lifetime) //: int|false
-    {
-        // let memcached handle this with expiration time
-        return true;
-    }
-
-    /**
-     * Open session
-     *
-     * @param string $savePath
-     * @param string $name
-     * @return boolean
-     */
-    public function open(string $path, string $name): bool
-    {
-        // Note: session save path is not used
-        $this->sessionName = $name;
-        $this->lifetime = ini_get('session.gc_maxlifetime');
-        return true;
-    }
-
-    /**
-     * Read session data
-     *
-     * @param string $id
-     * @return string|false
-     */
+    * Read session data
+    *
+    * @param string $id
+    * @return string|false
+    */
     #[\ReturnTypeWillChange]
     public function read(string $id) //: string|false
     {
-        $_SESSION = json_decode($this->memcached->get("sessions/{$id}"), true);
-
-        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null)
-        {
+        $_SESSION = json_decode((string) $this->memcached->get($this->prefix . $id), true);
+        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null) {
             return session_encode();
         }
-
         return '';
     }
 
     /**
-     * Write session data
-     *
-     * @param string $id
-     * @param string $data
-     * @return boolean
-     */
+    * Write session data
+    *
+    * @param string $id
+    * @param string $data
+    * @return boolean
+    */
     public function write(string $id, string $data): bool
     {
         // note: $data is not used as it has already been serialised by PHP,
         // so we use $_SESSION which is an unserialised version of $data.
-        return $this->memcached->set("sessions/{$id}", json_encode($_SESSION), $this->lifetime);
+        return (bool) $this->memcached->set($this->prefix . $id, json_encode($_SESSION), $this->expire);
+
+    }
+
+    /**
+    * Destroy session
+    *
+    * @param string $id
+    * @return boolean
+    */
+    public function destroy(string $id): bool
+    {
+        return (bool) $this->memcached->delete($this->prefix . $id);
+    }
+
+    /**
+    * Garbage collect. Memcache handles this with expiration times.
+    *
+    * @param int $maxlifetime
+    * @return int|false true successs false failure?
+    */
+    #[\ReturnTypeWillChange]
+    public function gc(int $max_lifetime) //: int|false
+    {
+        // let memcached handle this with expiration time
+        $this->expire = $max_lifetime;
+        return true;
     }
 
     /**
@@ -112,6 +117,11 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
         // available since PHP 5.5.1
         // invoked internally when a new session id is needed
         // no parameter is needed and return value should be the new session id created
+       do {
+            $sessionId = md5(uniqid('', true));
+        } while ($this->memcached->get($this->prefix . $sessionId));
+
+        return $sessionId;
     }
 
     /**
@@ -126,6 +136,7 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
         // implements SessionUpdateTimestampHandlerInterface::validateId()
         // available since PHP 7.0
         // return value should be true for success or false for failure
+        return (bool) $this->memcached->touch($this->prefix . $id, 0);
     }
 
     /**
@@ -140,5 +151,19 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
         // available since PHP 7.0
         // return value should be true if the session id is valid otherwise false
         // if false is returned a new session id will be generated by php internally
+        return (bool) $this->idExists($id);
+    }
+
+
+    /**
+    * Checks if a session ID exists in the memcached instance.
+    *
+    * @param string $sessionId The session ID to check
+    *
+    * @return bool
+    */
+    public function idExists($id)
+    {
+        return (bool) $this->memcached->get($this->prefix . $id);
     }
 }

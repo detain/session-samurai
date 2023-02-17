@@ -2,6 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
+
 class Mysqli implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     /**

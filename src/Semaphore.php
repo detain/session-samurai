@@ -1,6 +1,8 @@
 <?php
 
-class Semaphore implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface {
+namespace Detain\SessionSamurai;
+
+class Semaphore implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
 
     private $sessionId;
     private $lock;

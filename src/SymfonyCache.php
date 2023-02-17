@@ -1,12 +1,14 @@
 <?php
 
+namespace Detain\SessionSamurai;
+
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpFoundation\Session\SessionUpdateTimestampHandlerInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler;
 
-class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $cache;
     private $ttl;

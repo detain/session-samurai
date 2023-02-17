@@ -1,6 +1,8 @@
 <?php
 
-class Apc implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+namespace Detain\SessionSamurai;
+
+class Apc implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $lifetime;
     private $prefix;

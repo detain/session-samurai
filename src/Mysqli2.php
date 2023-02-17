@@ -1,5 +1,9 @@
 <?php
-class Mysqli2 {
+
+namespace Detain\SessionSamurai;
+
+class Mysqli2 implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+{
 
     protected $handler;
 

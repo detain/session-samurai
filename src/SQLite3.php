@@ -2,7 +2,8 @@
 
 namespace Detain\SessionSamurai;
 
-class SQLite3 implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface {
+
+class SQLite3 implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
     private $db;
     private $table = 'sessions';
     private $lifetime = 1440;

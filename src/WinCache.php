@@ -1,6 +1,8 @@
 <?php
 
-class WinCacheSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface {
+namespace Detain\SessionSamurai;
+
+class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
 
     public function __construct() {
         if (!extension_loaded('wincache')) {
