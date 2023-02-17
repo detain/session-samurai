@@ -2,143 +2,71 @@
 
 namespace Detain\SessionSamurai;
 
-class SQLite3 implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
-{
-    /**
-    * @var \Memcached
-    */
-    protected \Memcached $memcached;
+class SQLite3 implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface {
+    private $db;
+    private $table = 'sessions';
+    private $lifetime = 1440;
 
-    /**
-     * Create new memcached session save handler
-     * @param \Memcached $memcached
-     */
-    public function __construct(\Memcached $memcached)
-    {
-        $this->memcached = $memcached;
-    }
-
-    /**
-     * Close session
-     *
-     * @return boolean
-     */
-    public function close(): bool
-    {
-        // return value should be true for success or false for failure
+    public function open($savePath, $sessionName) {
+        $this->db = new SQLite3($savePath . '/' . $sessionName . '.db');
+        $this->db->exec("CREATE TABLE IF NOT EXISTS {$this->table} (id TEXT PRIMARY KEY, data TEXT, timestamp INTEGER)");
         return true;
     }
 
-
-    /**
-     * Destroy session
-     *
-     * @param string $id
-     * @return boolean
-     */
-    public function destroy(string $id): bool
-    {
-        return $this->memcached->delete("sessions/{$id}");
-    }
-
-    /**
-     * Garbage collect. Memcache handles this with expiration times.
-     *
-     * @param int $maxlifetime
-     * @return int|false true successs false failure?
-     */
-    #[\ReturnTypeWillChange]
-    public function gc(int $max_lifetime) //: int|false
-    {
-        // let memcached handle this with expiration time
+    public function close() {
+        $this->db->close();
         return true;
     }
 
-    /**
-     * Open session
-     *
-     * @param string $savePath
-     * @param string $name
-     * @return boolean
-     */
-    public function open(string $path, string $name): bool
-    {
-        // Note: session save path is not used
-        $this->sessionName = $name;
-        $this->lifetime = ini_get('session.gc_maxlifetime');
+    public function read($sessionId) {
+        $stmt = $this->db->prepare("SELECT data FROM {$this->table} WHERE id = :id AND timestamp >= :timestamp");
+        $stmt->bindValue(':id', $sessionId, SQLITE3_TEXT);
+        $stmt->bindValue(':timestamp', time() - $this->lifetime, SQLITE3_INTEGER);
+        $result = $stmt->execute();
+        $data = $result->fetchArray(SQLITE3_ASSOC);
+        return $data['data'] ?? '';
+    }
+
+    public function write($sessionId, $data) {
+        $stmt = $this->db->prepare("REPLACE INTO {$this->table} (id, data, timestamp) VALUES (:id, :data, :timestamp)");
+        $stmt->bindValue(':id', $sessionId, SQLITE3_TEXT);
+        $stmt->bindValue(':data', $data, SQLITE3_TEXT);
+        $stmt->bindValue(':timestamp', time(), SQLITE3_INTEGER);
+        $stmt->execute();
         return true;
     }
 
-    /**
-     * Read session data
-     *
-     * @param string $id
-     * @return string|false
-     */
-    #[\ReturnTypeWillChange]
-    public function read(string $id) //: string|false
-    {
-        $_SESSION = json_decode($this->memcached->get("sessions/{$id}"), true);
-
-        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null)
-        {
-            return session_encode();
-        }
-
-        return '';
+    public function destroy($sessionId) {
+        $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
+        $stmt->bindValue(':id', $sessionId, SQLITE3_TEXT);
+        $stmt->execute();
+        return true;
     }
 
-    /**
-     * Write session data
-     *
-     * @param string $id
-     * @param string $data
-     * @return boolean
-     */
-    public function write(string $id, string $data): bool
-    {
-        // note: $data is not used as it has already been serialised by PHP,
-        // so we use $_SESSION which is an unserialised version of $data.
-        return $this->memcached->set("sessions/{$id}", json_encode($_SESSION), $this->lifetime);
+    public function gc($maxlifetime) {
+        $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE timestamp < :timestamp");
+        $stmt->bindValue(':timestamp', time() - $this->lifetime, SQLITE3_INTEGER);
+        $stmt->execute();
+        return true;
     }
 
-    /**
-    * Creates a new SID
-    *
-    * @return string
-    */
-    public function create_sid(): string
-    {
-        // available since PHP 5.5.1
-        // invoked internally when a new session id is needed
-        // no parameter is needed and return value should be the new session id created
+    public function create_sid() {
+        return uniqid();
     }
 
-    /**
-    * Update the session timestamp
-    *
-    * @param string $id
-    * @param string $data
-    * @return bool
-    */
-    public function updateTimestamp(string $id, string $data): bool
-    {
-        // implements SessionUpdateTimestampHandlerInterface::validateId()
-        // available since PHP 7.0
-        // return value should be true for success or false for failure
+    public function validateId($sessionId) {
+        return preg_match('/^[a-f\d]{32}$/i', $sessionId);
     }
 
-    /**
-    * Verifies a session id
-    *
-    * @param string $id
-    * @return bool
-    */
-    public function validateId(string $id): bool
-    {
-        // implements SessionUpdateTimestampHandlerInterface::validateId()
-        // available since PHP 7.0
-        // return value should be true if the session id is valid otherwise false
-        // if false is returned a new session id will be generated by php internally
+    public function updateTimestamp($sessionId, $sessionData) {
+        $stmt = $this->db->prepare("UPDATE {$this->table} SET timestamp = :timestamp WHERE id = :id");
+        $stmt->bindValue(':id', $sessionId, SQLITE3_TEXT);
+        $stmt->bindValue(':timestamp', time(), SQLITE3_INTEGER);
+        $stmt->execute();
+        return true;
+    }
+
+    public function setLifetime($lifetime) {
+        $this->lifetime = $lifetime;
     }
 }

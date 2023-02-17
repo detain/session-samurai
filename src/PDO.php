@@ -2,143 +2,73 @@
 
 namespace Detain\SessionSamurai;
 
-class PDO implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class PDO implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
-    /**
-    * @var \Memcached
-    */
-    protected \Memcached $memcached;
+    protected $pdo;
 
-    /**
-     * Create new memcached session save handler
-     * @param \Memcached $memcached
-     */
-    public function __construct(\Memcached $memcached)
+    public function __construct(PDO $pdo)
     {
-        $this->memcached = $memcached;
+        $this->pdo = $pdo;
     }
 
-    /**
-     * Close session
-     *
-     * @return boolean
-     */
-    public function close(): bool
+    public function open($savePath, $sessionName)
     {
-        // return value should be true for success or false for failure
+        // No action needed since PDO handles the connection.
         return true;
     }
 
-
-    /**
-     * Destroy session
-     *
-     * @param string $id
-     * @return boolean
-     */
-    public function destroy(string $id): bool
+    public function close()
     {
-        return $this->memcached->delete("sessions/{$id}");
-    }
-
-    /**
-     * Garbage collect. Memcache handles this with expiration times.
-     *
-     * @param int $maxlifetime
-     * @return int|false true successs false failure?
-     */
-    #[\ReturnTypeWillChange]
-    public function gc(int $max_lifetime) //: int|false
-    {
-        // let memcached handle this with expiration time
+        // No action needed since PDO handles the connection.
         return true;
     }
 
-    /**
-     * Open session
-     *
-     * @param string $savePath
-     * @param string $name
-     * @return boolean
-     */
-    public function open(string $path, string $name): bool
+    public function read($sessionId)
     {
-        // Note: session save path is not used
-        $this->sessionName = $name;
-        $this->lifetime = ini_get('session.gc_maxlifetime');
+        $statement = $this->pdo->prepare("SELECT data FROM sessions WHERE id = :id");
+        $statement->execute(['id' => $sessionId]);
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+        return $row ? $row['data'] : '';
+    }
+
+    public function write($sessionId, $data)
+    {
+        $statement = $this->pdo->prepare("REPLACE INTO sessions (id, data, updated_at) VALUES (:id, :data, :updated_at)");
+        $statement->execute(['id' => $sessionId, 'data' => $data, 'updated_at' => time()]);
         return true;
     }
 
-    /**
-     * Read session data
-     *
-     * @param string $id
-     * @return string|false
-     */
-    #[\ReturnTypeWillChange]
-    public function read(string $id) //: string|false
+    public function destroy($sessionId)
     {
-        $_SESSION = json_decode($this->memcached->get("sessions/{$id}"), true);
-
-        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null)
-        {
-            return session_encode();
-        }
-
-        return '';
+        $statement = $this->pdo->prepare("DELETE FROM sessions WHERE id = :id");
+        $statement->execute(['id' => $sessionId]);
+        return true;
     }
 
-    /**
-     * Write session data
-     *
-     * @param string $id
-     * @param string $data
-     * @return boolean
-     */
-    public function write(string $id, string $data): bool
+    public function gc($maxlifetime)
     {
-        // note: $data is not used as it has already been serialised by PHP,
-        // so we use $_SESSION which is an unserialised version of $data.
-        return $this->memcached->set("sessions/{$id}", json_encode($_SESSION), $this->lifetime);
+        $statement = $this->pdo->prepare("DELETE FROM sessions WHERE updated_at < :expiry");
+        $statement->execute(['expiry' => time() - $maxlifetime]);
+        return true;
     }
 
-    /**
-    * Creates a new SID
-    *
-    * @return string
-    */
-    public function create_sid(): string
+    public function create_sid()
     {
-        // available since PHP 5.5.1
-        // invoked internally when a new session id is needed
-        // no parameter is needed and return value should be the new session id created
+        return uniqid();
     }
 
-    /**
-    * Update the session timestamp
-    *
-    * @param string $id
-    * @param string $data
-    * @return bool
-    */
-    public function updateTimestamp(string $id, string $data): bool
+    public function validateId($sessionId)
     {
-        // implements SessionUpdateTimestampHandlerInterface::validateId()
-        // available since PHP 7.0
-        // return value should be true for success or false for failure
+        $statement = $this->pdo->prepare("SELECT updated_at FROM sessions WHERE id = :id");
+        $statement->execute(['id' => $sessionId]);
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+        return $row && $row['updated_at'] >= time() - ini_get('session.gc_maxlifetime');
     }
 
-    /**
-    * Verifies a session id
-    *
-    * @param string $id
-    * @return bool
-    */
-    public function validateId(string $id): bool
+    public function updateTimestamp($sessionId, $sessionData)
     {
-        // implements SessionUpdateTimestampHandlerInterface::validateId()
-        // available since PHP 7.0
-        // return value should be true if the session id is valid otherwise false
-        // if false is returned a new session id will be generated by php internally
+        $statement = $this->pdo->prepare("UPDATE sessions SET updated_at = :updated_at WHERE id = :id");
+        $statement->execute(['id' => $sessionId, 'updated_at' => time()]);
+        return true;
     }
 }
