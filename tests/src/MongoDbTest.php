@@ -1,5 +1,7 @@
 <?php
 
+namespace Detain\SessionSamurailTests;
+
 use PHPUnit\Framework\TestCase;
 
 class MongoDbTest extends TestCase

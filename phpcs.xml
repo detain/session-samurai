@@ -22,6 +22,7 @@
 
     <!-- Paths to check -->
     <file>src</file>
+    <file>tests</file>
 
     <!-- folders / files to exclude -->
     <exclude-pattern>vendor/*</exclude-pattern>

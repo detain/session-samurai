@@ -1,6 +1,8 @@
 <?php
 
-use \PHPUnit\Framework\TestCase;
+namespace Detain\SessionSamurailTests;
+
+use PHPUnit\Framework\TestCase;
 
 // Test for Redis session handler class
 class RedisTest extends TestCase

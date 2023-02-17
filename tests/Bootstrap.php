@@ -1,6 +1,6 @@
 <?php
 
-error_reporting( E_ALL | E_STRICT );
+error_reporting(E_ALL | E_STRICT);
 
 $root        = realpath(dirname(__DIR__));
 $coreLibrary = "$root/src";

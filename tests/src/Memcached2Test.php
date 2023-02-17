@@ -1,5 +1,7 @@
 <?php
 
+namespace Detain\SessionSamurailTests;
+
 use PHPUnit\Framework\TestCase;
 use Memcached;
 
@@ -18,10 +20,7 @@ class MemcachedSessionHandlerTest extends TestCase
     }
 
 
-    /**
-     * @test
-     */
-    public function open_succeeds()
+    public function openSucceeds()
     {
         $sessionId = 'TEST_SESSION';
         $savePath = '/tmp';
@@ -30,10 +29,7 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertTrue($this->handler->open($savePath, $sessionId));
     }
 
-    /**
-     * @test
-     */
-    public function read_succeeds()
+    public function readSucceeds()
     {
         $sessionId = 'TEST_SESSION';
         $savePath = '/tmp';
@@ -43,10 +39,7 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertEquals($data, $this->handler->read($sessionId));
     }
 
-    /**
-     * @test
-     */
-    public function write_succeeds()
+    public function writeSucceeds()
     {
         $sessionId = 'TEST_SESSION';
         $savePath = '/tmp';
@@ -55,10 +48,7 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertTrue($this->handler->write($sessionId, $data));
     }
 
-    /**
-     * @test
-     */
-    public function destroy_succeeds()
+    public function destroySucceeds()
     {
         $sessionId = 'TEST_SESSION';
         $savePath = '/tmp';
@@ -68,19 +58,15 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertTrue($this->handler->destroy($sessionId));
     }
 
-    /**
-     * @test
-     */
-    public function create_sid_succeeds()
+
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sidSucceeds()
     {
         $sessionId = $this->handler->create_sid();
         $this->assertNotEmpty($sessionId);
     }
 
-    /**
-     * @test
-     */
-    public function validateId_succeeds()
+    public function validateIdSucceeds()
     {
         $sessionId = 'TEST_SESSION';
         $savePath = '/tmp';
@@ -90,10 +76,7 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertTrue($this->handler->validateId($sessionId));
     }
 
-    /**
-     * @test
-     */
-    public function updateTimestamp_succeeds()
+    public function updateTimestampSucceeds()
     {
         $sessionId = 'TEST_SESSION';
         $savePath = '/tmp';
@@ -101,5 +84,5 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->memcached->set($this->prefix . $sessionId, $data);
 
         $this->assertTrue($this->handler->updateTimestamp($sessionId, $data));
-	}
+    }
 }

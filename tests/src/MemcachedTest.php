@@ -1,6 +1,6 @@
 <?php
 
-namespace DetainTest\SessionSamuraiTest;
+namespace Detain\SessionSamurailTests;
 
 use Detain\SessionSamurai\Memcached;
 
