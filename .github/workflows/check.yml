@@ -1,0 +1,56 @@
+name: check
+
+on: push
+
+jobs:
+  check:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: ['ubuntu-latest']
+        php: ['8.0', '8.1', '8.2']
+
+    name: PHP ${{ matrix.php }} - ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - run: git fetch origin master
+
+    - name: Setup PHP ${{ matrix.php }}
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+
+    - name: Get composer cache directory
+      id: composer-cache
+      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-${{ matrix.php }}-composer-
+
+    - name: Validate composer.json
+      run: composer validate
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Run PHP Simple Lint
+      uses: davidlienhard/php-simple-lint@v1
+      with:
+        folder: './'
+        ignore: './vendor/\*'
+
+    - name: Show changed files
+      run: composer changed-files
+
+    - name: Run phpcs
+      run: composer phpcs-diff
+
+    - name: Run phpstan
+      run: composer phpstan

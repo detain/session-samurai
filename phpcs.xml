@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ruleset name="tourBase coding standard">
+    <description>tourBase coding standard</description>
+
+    <!-- inherit rules -->
+    <rule ref="DavidLienhard">
+        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint" />
+        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint" />
+    </rule>
+
+    <!-- Paths to check -->
+    <file>src</file>
+
+    <!-- folders / files to exclude -->
+    <exclude-pattern>vendor/*</exclude-pattern>
+</ruleset>

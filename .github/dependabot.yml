@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    assignees:
+      - "davidlienhard"
+    labels:
+      - "enhancement"
+      - "dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "davidlienhard"
+    labels:
+      - "enhancement"
+      - "dependencies"
