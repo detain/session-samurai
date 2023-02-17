@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class Session implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class Redis implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $savePath;
 

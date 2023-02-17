@@ -1,9 +1,46 @@
 # Session Samurai 🥷
+
+[![Build Status](https://travis-ci.org/detain/session-samurai.png?branch=master)](https://travis-ci.org/detain/session-samurai)
+
 Universal high-speed asynchronous (non-blocking) SessionHandlerInterface implementation for PHP supporting shared memory, redis, memcached, mysqli, pdo, mongodb, and local file storage.
  
 "_Session handling is like a sword fight_<br>
 _You must think first before you move_<br>
 _When it's properly used it's almost invincible_"
+
+
+## Installation
+
+Use [composer](http://getcomposer.org/) to include the save handler in your application.
+```bash
+composer requre detain/session-samurai
+```
+
+## Usage
+
+```php
+require 'vendor/autoload.php';  // set up autoloading using composer
+
+$memcached = new Memcached();  // create connection to memcached
+$memcached->addServer('localhost', 11211);
+
+$handler = new Detain\SessionSamurai\Memcached($memcached);  // register handler (PHP 5.3 compatible)
+
+session_set_save_handler(
+    array($handler, 'open'),    
+    array($handler, 'close'),
+    array($handler, 'read'),
+    array($handler, 'write'),
+    array($handler, 'destroy'),
+    array($handler, 'gc')
+);
+
+register_shutdown_function('session_write_close');  // the following prevents unexpected effects when using objects as save handlers
+
+session_start();
+
+$_SESSION['serialisation'] = 'should be in json';  // start using the session
+```
 
 ## Development notes
 
@@ -21,7 +58,7 @@ _When it's properly used it's almost invincible_"
 * [ramazancetinkaya/session-handler](https://github.com/ramazancetinkaya/session-handler): A PHP library for secure session handling.
 * [davidlienhard/sessionhandler](https://github.com/davidlienhard/sessionhandler): 🐘 php sessionhandler using database connection
 * [zahycz/sessionless](https://github.com/zahycz/sessionless): Non-I/O blocking SessionHandler implementation using Nette/Caching
-* [lboynton/memcached-json-session-save-handler](https://github.com/lboynton/memcached-json-session-save-handler): A custom PHP session save handler for storing sessions as JSON in memcached.
+* [detain/session-samurai](https://github.com/detain/session-samurai): A custom PHP session save handler for storing sessions as JSON in memcached.
 * [javis/php-memcached-sessions](https://github.com/javis/php-memcached-sessions): A PHP session handler that uses memcached to store session with multiple servers, failover and replication support.
 * [PHP Cache](https://www.php-cache.com/en/latest/) - PHP-Cache Documentation
 * [The Cache Component](https://symfony.com/doc/current/components/cache.html#available-cache-adapters) (Symfony Docs)

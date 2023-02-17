@@ -3,6 +3,7 @@
     "description": "🥷 Universal high-speed asynchronous (non-blocking) SessionHandlerInterface implementation for PHP supporting shared memory, redis, memcached, mysqli, pdo, mongodb, and local file storage.",
     "type": "library",
     "require": {
+        "php": ">=5.3.0",
         "ext-session": "*"
     },
     "license": "GPL-3.0",
