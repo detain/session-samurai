@@ -15,7 +15,7 @@
         "ext-session": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=6.0,<8@stable",
+        "phpunit/phpunit": ">=6.0,<9@stable",
         "squizlabs/php_codesniffer": "*",
         "friendsofphp/php-cs-fixer": "*",
 	    "phpstan/phpstan": "*"
