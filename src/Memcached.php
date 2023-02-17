@@ -19,7 +19,7 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     * Create new memcached session save handler
     * @param \Memcached $memcached
     */
-    public function __construct(\Memcached $memcached, string $prefix = '')
+    public function __construct(\Memcached $memcached, string $prefix = 'sess-')
     {
         $this->memcached = $memcached;
         $this->prefix = $prefix;

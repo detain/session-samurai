@@ -26,25 +26,10 @@ composer requre detain/session-samurai
 ```php
 require 'vendor/autoload.php';  // set up autoloading using composer
 
-$memcached = new Memcached();  // create connection to memcached
+$memcached = new \Memcached();  // create connection to memcached
 $memcached->addServer('localhost', 11211);
-
-$handler = new Detain\SessionSamurai\Memcached($memcached);  // register handler (PHP 5.3 compatible)
-
-session_set_save_handler(
-    array($handler, 'open'),
-    array($handler, 'close'),
-    array($handler, 'read'),
-    array($handler, 'write'),
-    array($handler, 'destroy'),
-    array($handler, 'gc')
-);
-
-register_shutdown_function('session_write_close');  // the following prevents unexpected effects when using objects as save handlers
-
-session_start();
-
-$_SESSION['serialisation'] = 'should be in json';  // start using the session
+$handler = new \Detain\SessionSamurai\Memcached($memcached);
+session_set_save_handler($handler, true);
 ```
 
 ## Development notes
