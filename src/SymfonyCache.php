@@ -33,7 +33,7 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
 
     public function read($sessionId)
     {
-        $key = $this->prefix.$sessionId;
+        $key = $this->prefix . $sessionId;
         $data = $this->cache->getItem($key);
 
         if (!$data->isHit()) {
@@ -45,7 +45,7 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
 
     public function write($sessionId, $data)
     {
-        $key = $this->prefix.$sessionId;
+        $key = $this->prefix . $sessionId;
         $item = $this->cache->getItem($key);
         $item->set($data);
 
@@ -58,7 +58,7 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
 
     public function destroy($sessionId)
     {
-        $key = $this->prefix.$sessionId;
+        $key = $this->prefix . $sessionId;
 
         return $this->cache->deleteItem($key);
     }
@@ -68,6 +68,7 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
     public function create_sid()
     {
         return md5(uniqid('', true));

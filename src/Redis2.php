@@ -2,15 +2,14 @@
 
 namespace Detain\SessionSamurai;
 
-
 // Redis session handler class
 class Redis2 implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     // Namespace for keys for Redis
-    const NS = 'session';
+    public const NS = 'session';
 
     // TTL in seconds
-    const DEFAULT_TTL = 86400;
+    public const DEFAULT_TTL = 86400;
 
     // Instance of redis
     protected $redis;
@@ -33,7 +32,7 @@ class Redis2 implements \SessionHandlerInterface, \SessionIdInterface, \SessionU
         if (!$this->isChanged) {
             return true;
         }
-        $keys = $this->redis->keys($this->sessionId.':*');
+        $keys = $this->redis->keys($this->sessionId . ':*');
         foreach ($keys as $key) {
             $this->redis->del($key);
         }
@@ -50,7 +49,7 @@ class Redis2 implements \SessionHandlerInterface, \SessionIdInterface, \SessionU
     public function gc($maxlifetime)
     {
         $interval = $maxlifetime * 1000;
-        $this->redis->zremrangebyscore($this->sessionId.':timestamp', 0, (microtime(true) * 1000 - $interval));
+        $this->redis->zremrangebyscore($this->sessionId . ':timestamp', 0, (microtime(true) * 1000 - $interval));
     }
 
     // Gets the session id
@@ -73,7 +72,7 @@ class Redis2 implements \SessionHandlerInterface, \SessionIdInterface, \SessionU
         $this->isChanged = true;
         $this->sessionId = $sessionId;
         $this->redis->setex($this->sessionId, self::DEFAULT_TTL, $data);
-        $this->redis->zadd($this->sessionId.':timestamp', microtime(true) * 1000, microtime(true) * 1000);
+        $this->redis->zadd($this->sessionId . ':timestamp', microtime(true) * 1000, microtime(true) * 1000);
         return true;
     }
 
@@ -81,9 +80,7 @@ class Redis2 implements \SessionHandlerInterface, \SessionIdInterface, \SessionU
     public function updateTimestamp($sessionId, $data)
     {
         $this->sessionId = $sessionId;
-        $this->redis->zadd($this->sessionId.':timestamp', microtime(true) * 1000, microtime(true) * 1000);
+        $this->redis->zadd($this->sessionId . ':timestamp', microtime(true) * 1000, microtime(true) * 1000);
         return true;
     }
-
 }
-

@@ -2,8 +2,8 @@
 
 namespace Detain\SessionSamurai;
 
-
-class MongoDb implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
+class MongoDb implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+{
     protected $mongoConnection;
     protected $sessionCollection;
 
@@ -49,6 +49,7 @@ class MongoDb implements \SessionHandlerInterface, \SessionIdInterface, \Session
     }
 
     // SessionIdInterface
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid() {
         $sid = base64_encode(openssl_random_pseudo_bytes(20));
         return preg_replace("/\W/", "", $sid);

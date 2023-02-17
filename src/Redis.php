@@ -2,7 +2,6 @@
 
 namespace Detain\SessionSamurai;
 
-
 class Redis implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     /**
@@ -81,8 +80,7 @@ class Redis implements \SessionHandlerInterface, \SessionIdInterface, \SessionUp
     {
         $_SESSION = json_decode($this->memcached->get("sessions/{$id}"), true);
 
-        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null)
-        {
+        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null) {
             return session_encode();
         }
 
@@ -108,7 +106,9 @@ class Redis implements \SessionHandlerInterface, \SessionIdInterface, \SessionUp
     *
     * @return string
     */
-    public function create_sid(): string
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid()
+    //public function create_sid(): string
     {
         // available since PHP 5.5.1
         // invoked internally when a new session id is needed

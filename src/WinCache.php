@@ -2,8 +2,8 @@
 
 namespace Detain\SessionSamurai;
 
-class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
-
+class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+{
     public function __construct() {
         if (!extension_loaded('wincache')) {
             throw new RuntimeException('WinCache extension is not loaded');
@@ -35,6 +35,7 @@ class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid() {
         return bin2hex(random_bytes(32));
     }
@@ -47,4 +48,3 @@ class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         return true;
     }
 }
-

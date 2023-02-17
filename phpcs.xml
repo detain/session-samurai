@@ -3,9 +3,21 @@
     <description>tourBase coding standard</description>
 
     <!-- inherit rules -->
-    <rule ref="DavidLienhard">
-        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint" />
-        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint" />
+    <rule ref="PSR12">
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceSpacing" />
+        <exclude name="PSR2.Methods.FunctionClosingBrace.SpacingBeforeClose" />
+        <exclude name="Generic.Files.LineLength.TooLong" />
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine" />
+<!--
+        <exclude name="" />
+        <exclude name="" />
+        <exclude name="" />
+        <exclude name="" />
+        <exclude name="" />
+        <exclude name="" />
+        <exclude name="" />
+        <exclude name="" />
+        <exclude name="" /> -->
     </rule>
 
     <!-- Paths to check -->

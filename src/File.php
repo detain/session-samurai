@@ -2,7 +2,6 @@
 
 namespace Detain\SessionSamurai;
 
-
 class File implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $savePath;
@@ -58,7 +57,9 @@ class File implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpd
         return file_put_contents("$this->savePath/sess_$id", $data) === false ? false : true;
     }
 
-    public function create_sid(): string
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid()
+    //public function create_sid(): string
     {
         // available since PHP 5.5.1
         // invoked internally when a new session id is needed

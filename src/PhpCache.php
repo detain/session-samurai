@@ -52,6 +52,7 @@ class CacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterfa
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
     public function create_sid()
     {
         return uniqid($this->prefix);

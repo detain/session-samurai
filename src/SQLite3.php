@@ -2,8 +2,8 @@
 
 namespace Detain\SessionSamurai;
 
-
-class SQLite3 implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
+class SQLite3 implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+{
     private $db;
     private $table = 'sessions';
     private $lifetime = 1440;
@@ -51,6 +51,7 @@ class SQLite3 implements \SessionHandlerInterface, \SessionIdInterface, \Session
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid() {
         return uniqid();
     }

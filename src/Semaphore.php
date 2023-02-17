@@ -2,8 +2,8 @@
 
 namespace Detain\SessionSamurai;
 
-class Semaphore implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
-
+class Semaphore implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+{
     private $sessionId;
     private $lock;
     private $data;
@@ -57,6 +57,7 @@ class Semaphore implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid() {
         $sessionId = uniqid();
         $this->lock = sem_get($sessionId);

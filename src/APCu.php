@@ -2,8 +2,8 @@
 
 namespace Detain\SessionSamurai;
 
-class APCu implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
-
+class APCu implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+{
     private $ttl;
 
     public function __construct($ttl = 1800) {
@@ -34,6 +34,7 @@ class APCu implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpd
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid() {
         return bin2hex(random_bytes(16));
     }
@@ -45,5 +46,4 @@ class APCu implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpd
     public function updateTimestamp($sessionId, $sessionData) {
         return true;
     }
-
 }

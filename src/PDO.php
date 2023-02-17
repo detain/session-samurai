@@ -2,7 +2,6 @@
 
 namespace Detain\SessionSamurai;
 
-
 class PDO implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $pdo;
@@ -53,6 +52,7 @@ class PDO implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpda
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
     public function create_sid()
     {
         return uniqid();

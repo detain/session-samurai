@@ -2,7 +2,8 @@
 
 namespace Detain\SessionSamurai;
 
-class OpCache implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface {
+class OpCache implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+{
     private $sessionId;
 
     public function __construct() {
@@ -41,6 +42,7 @@ class OpCache implements \SessionHandlerInterface, \SessionIdInterface, \Session
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid() {
         $this->sessionId = bin2hex(random_bytes(32));
         return $this->sessionId;

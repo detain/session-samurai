@@ -117,13 +117,14 @@ class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
     *
     * @return string
     */
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
     public function create_sid()
     //public function create_sid(): string
     {
         // available since PHP 5.5.1
         // invoked internally when a new session id is needed
         // no parameter is needed and return value should be the new session id created
-       do {
+        do {
             $sessionId = md5(uniqid('', true));
         } while ($this->memcached->get($this->prefix . $sessionId));
 

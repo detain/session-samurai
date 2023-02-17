@@ -1,6 +1,7 @@
 <?php
 
 namespace Detain\SessionSamurai;
+
 use Phpfastcache\CacheManager;
 use Phpfastcache\Config\ConfigurationOption;
 use Phpfastcache\Core\Item\ExtendedCacheItemInterface;
@@ -63,6 +64,7 @@ class PhpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         $this->cache->save($item);
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
     public function create_sid()
     {
         return bin2hex(random_bytes(32));

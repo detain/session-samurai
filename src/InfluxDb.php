@@ -69,6 +69,7 @@ class InfluxDBSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
     public function create_sid()
     {
         return bin2hex(random_bytes(16));

@@ -65,6 +65,7 @@ class FlySystem implements \SessionHandlerInterface, \SessionIdInterface, \Sessi
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
     public function create_sid()
     {
         return md5(uniqid());
