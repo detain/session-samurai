@@ -9,6 +9,11 @@ _You must think first before you move_<br>
 _When it's properly used it's almost invincible_"
 
 
+## Project Status
+
+*Session Samurai 🥷* is fresh off the block and is still figuring out what it wants to do with its life.  Soon it will grow into a mega-hotie that does the same stuff others do, only he makes it look good.
+
+
 ## Installation
 
 Use [composer](http://getcomposer.org/) to include the save handler in your application.
