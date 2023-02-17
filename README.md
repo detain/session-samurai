@@ -1,6 +1,6 @@
 # Session Samurai 🥷
 
-[![Build Status](https://travis-ci.org/detain/session-samurai.png?branch=master)](https://travis-ci.org/detain/session-samurai)
+[![Build Status](https://travis-ci.com/detain/session-samurai.png?branch=master)](https://travis-ci.com/detain/session-samurai)
 
 Universal high-speed asynchronous (non-blocking) SessionHandlerInterface implementation for PHP supporting shared memory, redis, memcached, mysqli, pdo, mongodb, and local file storage.
  
