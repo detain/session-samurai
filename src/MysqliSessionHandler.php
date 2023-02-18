@@ -2,144 +2,79 @@
 
 namespace Detain\SessionSamurai;
 
-class MysqliSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class MySqliSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
-    /**
-    * @var \Memcached
-    */
-    protected \Memcached $memcached;
+    protected $mysqli;
 
-    /**
-     * Create new memcached session save handler
-     * @param \Memcached $memcached
-     */
-    public function __construct(\Memcached $memcached)
+    public function __construct($mysqli)
     {
-        $this->memcached = $memcached;
+        $this->mysqli = $mysqli;
     }
 
-    /**
-     * Close session
-     *
-     * @return boolean
-     */
-    public function close(): bool
+    //open a connection to the session storage
+    public function open($save_path, $name)
     {
-        // return value should be true for success or false for failure
         return true;
     }
 
-
-    /**
-     * Destroy session
-     *
-     * @param string $id
-     * @return boolean
-     */
-    public function destroy(string $id): bool
+    //close the connection to the session storage
+    public function close()
     {
-        return $this->memcached->delete("sessions/{$id}");
-    }
-
-    /**
-     * Garbage collect. Memcache handles this with expiration times.
-     *
-     * @param int $maxlifetime
-     * @return int|false true successs false failure?
-     */
-    #[\ReturnTypeWillChange]
-    public function gc(int $max_lifetime) //: int|false
-    {
-        // let memcached handle this with expiration time
         return true;
     }
 
-    /**
-     * Open session
-     *
-     * @param string $savePath
-     * @param string $name
-     * @return boolean
-     */
-    public function open(string $path, string $name): bool
+    //read the session data for this session
+    public function read($sid)
     {
-        // Note: session save path is not used
-        $this->sessionName = $name;
-        $this->lifetime = ini_get('session.gc_maxlifetime');
-        return true;
+        $select_statement = $this->mysqli->prepare("SELECT data FROM sessions WHERE sid=?");
+        $select_statement->bind_param('s', $sid);
+        $select_statement->execute();
+        $select_statement->bind_result($data);
+        $select_statement->fetch();
+
+        return $data;
     }
 
-    /**
-     * Read session data
-     *
-     * @param string $id
-     * @return string|false
-     */
-    #[\ReturnTypeWillChange]
-    public function read(string $id) //: string|false
+    //write the session data to the session storage
+    public function write($sid, $data)
     {
-        $_SESSION = json_decode($this->memcached->get("sessions/{$id}"), true);
+        $update_statement = $this->mysqli->prepare("UPDATE sessions SET data=?, timestamp=UNIX_TIMESTAMP() WHERE sid=?");
+        $update_statement->bind_param('ss', $data, $sid);
+        $update_statement->execute();
 
-        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null) {
-            return session_encode();
+        if ($update_statement->affected_rows > 0) {
+            return true;
+        } else {
+            $insert_statement = $this->mysqli->prepare("INSERT INTO sessions (sid, data) VALUES (?, ?)");
+            $insert_statement->bind_param('ss', $sid, $data);
+            $insert_statement->execute();
+            return $insert_statement->affected_rows > 0;
         }
-
-        return '';
     }
 
-    /**
-     * Write session data
-     *
-     * @param string $id
-     * @param string $data
-     * @return boolean
-     */
-    public function write(string $id, string $data): bool
+    //destroy the session data from the session storage
+    public function destroy($sid)
     {
-        // note: $data is not used as it has already been serialised by PHP,
-        // so we use $_SESSION which is an unserialised version of $data.
-        return $this->memcached->set("sessions/{$id}", json_encode($_SESSION), $this->lifetime);
+        $delete_statement = $this->mysqli->prepare("DELETE FROM sessions WHERE sid=?");
+        $delete_statement->bind_param('s', $sid);
+        $delete_statement->execute();
+        return $delete_statement->affected_rows > 0;
     }
 
-    /**
-    * Creates a new SID
-    *
-    * @return string
-    */
+    //Garbage collection of expired sessions from the session storage
+    public function gc($maxLifeTime)
+    {
+        $timestamp = time() - $maxLifeTime;
+        $delete_statement = $this->mysqli->prepare("DELETE FROM sessions WHERE timestamp < ?");
+        $delete_statement->bind_param('i', $timestamp);
+        $delete_statement->execute();
+        return $delete_statement->affected_rows;
+    }
+
+    //Generate a new Session ID
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
-    //public function create_sid(): string
     {
-        // available since PHP 5.5.1
-        // invoked internally when a new session id is needed
-        // no parameter is needed and return value should be the new session id created
-    }
-
-    /**
-    * Update the session timestamp
-    *
-    * @param string $id
-    * @param string $data
-    * @return bool
-    */
-    public function updateTimestamp(string $id, string $data): bool
-    {
-        // implements SessionUpdateTimestampHandlerInterface::validateId()
-        // available since PHP 7.0
-        // return value should be true for success or false for failure
-    }
-
-    /**
-    * Verifies a session id
-    *
-    * @param string $id
-    * @return bool
-    */
-    public function validateId(string $id): bool
-    {
-        // implements SessionUpdateTimestampHandlerInterface::validateId()
-        // available since PHP 7.0
-        // return value should be true if the session id is valid otherwise false
-        // if false is returned a new session id will be generated by php internally
+        return bin2hex(random_bytes(32));
     }
 }
