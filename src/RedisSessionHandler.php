@@ -44,6 +44,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
         return true;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid(): string
     {
         $length = 32;
@@ -61,4 +62,3 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
         return $this->redis->expire($session_id, $this->ttl);
     }
 }
-

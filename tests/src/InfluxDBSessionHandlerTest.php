@@ -1,13 +1,15 @@
-<?php 
+<?php
+
+namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
 
 class InfluxDBSessionHandlerTest extends TestCase
 {
-    public function setUp(): void 
+    public function setUp(): void
     {
         // Create session handler instance
-        $this->handler = new InfluxDBSessionHandler(); 
+        $this->handler = new InfluxDBSessionHandler();
     }
 
     // Tests for open() method
@@ -30,8 +32,8 @@ class InfluxDBSessionHandlerTest extends TestCase
 
         $this->assertEquals($expectedResult, $actualResult);
     }
-    
-    // Tests for write() method 
+
+    // Tests for write() method
     public function testSessionDataWritten()
     {
         $data = [
@@ -51,7 +53,7 @@ class InfluxDBSessionHandlerTest extends TestCase
         $this->assertTrue($result);
     }
 
-    // Tests for destroy() method 
+    // Tests for destroy() method
     public function testCanDestroySession()
     {
         $result = $this->handler->destroy('testid');

@@ -1,10 +1,12 @@
 <?php
 
+namespace Detain\SessionSamuraiTest;
+
 class IlluminateSessionHandlerTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Mock object of Illuminate\Session\Store
-     * 
+     *
      * @var Illuminate\Session\Store
      */
     protected $store;

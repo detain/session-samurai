@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace YourNamespace\Tests;
 
@@ -9,14 +9,14 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\SessionHandlerDBAL;
 use PHPUnit\Framework\TestCase;
 
-class DoctrineDBALSessionHandlerTest extends TestCase 
+class DoctrineDBALSessionHandlerTest extends TestCase
 {
     /** @var Connection */
     protected $connection;
-    
+
     /** @var SessionHandlerDBAL */
     protected $dbalSessionHandler;
-    
+
     public function setUp(): void
     {
         $ids = [
@@ -24,22 +24,22 @@ class DoctrineDBALSessionHandlerTest extends TestCase
             'db_user' => 'foo_user',
             'db_pass' => 'foo_pass',
         ];
-    
+
         $pdo_dsn = "mysql:dbname={$ids['db_name']};"
-            ."host=localhost";
-        
+            . "host=localhost";
+
         $this->connection = DriverManager::getConnection(
             [
                 'pdo' => new \PDO($pdo_dsn, $ids['db_user'], $ids['db_pass'])
             ]
         );
-    
+
         $this->dbalSessionHandler = new SessionHandlerDBAL(
-            $this->connection 
+            $this->connection
         );
     }
-    
-    public function testOpenSession(): void 
+
+    public function testOpenSession(): void
     {
         $this->assertEquals(
             true,
@@ -47,15 +47,15 @@ class DoctrineDBALSessionHandlerTest extends TestCase
         );
     }
 
-    public function testCloseSession(): void 
+    public function testCloseSession(): void
     {
         $this->assertEquals(
             true,
             $this->dbalSessionHandler->close()
         );
     }
-    
-    public function testReadSession(): void 
+
+    public function testReadSession(): void
     {
         $this->assertEquals(
             '',
@@ -63,7 +63,7 @@ class DoctrineDBALSessionHandlerTest extends TestCase
         );
     }
 
-    public function testWriteSession(): void 
+    public function testWriteSession(): void
     {
         $this->assertEquals(
             true,
@@ -71,7 +71,7 @@ class DoctrineDBALSessionHandlerTest extends TestCase
         );
     }
 
-    public function testDestroySession(): void 
+    public function testDestroySession(): void
     {
         $this->assertEquals(
             true,
@@ -79,7 +79,7 @@ class DoctrineDBALSessionHandlerTest extends TestCase
         );
     }
 
-    public function testGcSession(): void 
+    public function testGcSession(): void
     {
         $this->assertEquals(
             true,

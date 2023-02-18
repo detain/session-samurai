@@ -1,5 +1,7 @@
 <?php
 
+namespace Detain\SessionSamuraiTest;
+
 class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOpen()

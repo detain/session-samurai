@@ -1,5 +1,7 @@
-<?php 
- 
+<?php
+
+namespace Detain\SessionSamuraiTest;
+
  use PHPUnit\Framework\TestCase;
 
 class PdoSessionHandlerTest extends TestCase

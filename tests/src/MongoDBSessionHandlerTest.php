@@ -1,5 +1,7 @@
 <?php
 
+namespace Detain\SessionSamuraiTest;
+
 use PHPUnit\Framework\TestCase;
 use MongoDB\Client;
 

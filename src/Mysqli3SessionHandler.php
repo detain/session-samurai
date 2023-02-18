@@ -1,5 +1,9 @@
-class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface {
+<?php
 
+namespace Detain\SessionSamurai;
+
+class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+{
     private $db;
 
     public function __construct(mysqli $db) {
@@ -50,6 +54,7 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
         return $result;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid() {
         return bin2hex(random_bytes(16));
     }

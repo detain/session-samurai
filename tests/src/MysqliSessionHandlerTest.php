@@ -1,5 +1,7 @@
 <?php
 
+namespace Detain\SessionSamuraiTest;
+
 class MysqliSessionHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSessionIdInterface()

@@ -1,5 +1,7 @@
 <?php
 
+namespace Detain\SessionSamuraiTest;
+
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -106,4 +108,3 @@ class SymfonyCacheSessionHandlerTest extends TestCase
         $this->assertTrue($this->handler->updateTimestamp($sessionId, $sessionData));
     }
 }
-

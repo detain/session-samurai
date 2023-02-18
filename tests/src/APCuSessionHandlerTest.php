@@ -1,10 +1,11 @@
 <?php
 
+namespace Detain\SessionSamuraiTest;
+
 use PHPUnit\Framework\TestCase;
 
 class APCuSessionHandlerTest extends TestCase
 {
-
     public function testConstructor()
     {
         $handler = new APCuSessionHandler();
@@ -51,7 +52,7 @@ class APCuSessionHandlerTest extends TestCase
     public function testDestroy()
     {
         $handler = new APCuSessionHandler();
-       
+
         apcu_store('testkey', ' testvalue');
         $this->assertTrue($handler->destroy('testkey'));
         $this->assertFalse(apcu_fetch('testkey'));
