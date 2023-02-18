@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class Semaphore implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $sessionId;
     private $lock;

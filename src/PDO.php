@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class PDO implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class PDOSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $pdo;
 

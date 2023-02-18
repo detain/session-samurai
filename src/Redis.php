@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class Redis implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class RedisSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     /**
     * @var \Memcached

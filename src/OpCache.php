@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class OpCache implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $sessionId;
 

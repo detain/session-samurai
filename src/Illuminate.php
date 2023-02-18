@@ -6,7 +6,7 @@ use Illuminate\Session\DatabaseSessionHandler;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Arr;
 
-class Illuminate implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class IlluminateSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $manager;
     protected $handler;

@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class File implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class FileSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $savePath;
 

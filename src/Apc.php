@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class Apc implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class ApcSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $lifetime;
     private $prefix;

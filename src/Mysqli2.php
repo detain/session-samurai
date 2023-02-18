@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class Mysqli2 implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $handler;
 

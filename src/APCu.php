@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class APCu implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class APCuSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $ttl;
 

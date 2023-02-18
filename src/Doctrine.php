@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandle
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 
-class Doctrine extends PdoSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $connection;
 

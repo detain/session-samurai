@@ -7,7 +7,7 @@ use SessionHandlerInterface;
 use SessionIdInterface;
 use SessionUpdateTimestampHandlerInterface;
 
-class FlySystem implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $filesystem;
     protected $path;

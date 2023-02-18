@@ -3,7 +3,7 @@
 namespace Detain\SessionSamurai;
 
 // Redis session handler class
-class Redis2 implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class Redis2SessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     // Namespace for keys for Redis
     public const NS = 'session';

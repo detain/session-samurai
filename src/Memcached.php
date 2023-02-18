@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class Memcached implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     /**
     * @var Memcached The memcached object

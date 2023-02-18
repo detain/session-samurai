@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandle
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler;
 
-class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class SymfonyCacheSessionHandlerSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private $cache;
     private $ttl;

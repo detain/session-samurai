@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class MongoDb implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $mongoConnection;
     protected $sessionCollection;
