@@ -6,8 +6,6 @@ use Detain\SessionSamurai\MemcachedSessionHandler;
 
 /**
  * Tests for memcached session save handler
- *
- * @author Lee Boynton <lee@lboynton.com>
  */
 class MemcachedTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,10 +19,9 @@ class MemcachedTest extends \PHPUnit\Framework\TestCase
      */
     protected $originalSessionSavePath;
 
-    public function setUp()
+    public function setUp(): void
     {
-        // fix permission denied warnings by setting to a path we should have
-        // write access to
+        // fix permission denied warnings by setting to a path we should have write access to
         $this->originalSessionSavePath = session_save_path();
         session_save_path('/tmp');
 
@@ -45,14 +42,14 @@ class MemcachedTest extends \PHPUnit\Framework\TestCase
         $_SESSION = array('foo' => 'bar', 'bar' => array('foo' => 'bar'));
 
         $this->assertTrue($saveHandler->write($id, session_encode()));
-        $this->assertEquals($_SESSION, json_decode($this->memcached->get("sessions/{$id}"), true));
+        $this->assertEquals($_SESSION, json_decode($this->memcached->get("sess-{$id}"), true));
         $serializedSession = $saveHandler->read($id);
         $this->assertTrue(!empty($serializedSession));
 
         $_SESSION = array('foo' => array(1, 2, 3));
 
         $this->assertTrue($saveHandler->write($id, serialize($_SESSION)));
-        $this->assertEquals($_SESSION, json_decode($this->memcached->get("sessions/{$id}"), true));
+        $this->assertEquals($_SESSION, json_decode($this->memcached->get("sess-{$id}"), true));
         $serializedSession2 = $saveHandler->read($id);
         $this->assertTrue(!empty($serializedSession2));
     }
@@ -70,13 +67,16 @@ class MemcachedTest extends \PHPUnit\Framework\TestCase
         $_SESSION = array('foo' => 'bar', 'bar' => array('foo' => 'bar'));
 
         $saveHandler->write($id, serialize($_SESSION));
-        $this->assertEquals($_SESSION, json_decode($this->memcached->get("sessions/{$id}"), true));
+        $this->assertEquals($_SESSION, json_decode($this->memcached->get("sess-{$id}"), true));
 
         $saveHandler->destroy($id);
         $this->assertEquals('', $saveHandler->read($id));
-        $this->assertFalse($this->memcached->get("sessions/{$id}"));
+        $this->assertFalse($this->memcached->get("sess-{$id}"));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testGarbageCollection()
     {
         $saveHandler = new MemcachedSessionHandler($this->memcached);
@@ -84,6 +84,9 @@ class MemcachedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($saveHandler->gc(-1));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testClose()
     {
         $saveHandler = new MemcachedSessionHandler($this->memcached);
@@ -91,11 +94,10 @@ class MemcachedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($saveHandler->close());
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->memcached->flush();
-
         // reset session save path back to default
-        session_save_path($this->originalSessionSavePath);
+        @session_save_path($this->originalSessionSavePath);
     }
 }
