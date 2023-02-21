@@ -1,6 +1,6 @@
 <?php
 
-namespace Detain\SessionSamurailTests;
+namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
 

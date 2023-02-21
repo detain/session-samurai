@@ -22,12 +22,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Detain\\SessionSamurail\\": "src/"
+            "Detain\\SessionSamurai\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Detain\\SessionSamurailTests\\": "tests/src/"
+            "Detain\\SessionSamuraiTest\\": "tests/src/"
         }
     },
     "minimum-stability": "dev",
