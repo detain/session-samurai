@@ -36,9 +36,11 @@
         "phpcs": "./vendor/bin/phpcs",
         "phpcs-diff": "@composer changed-files | xargs ls -d 2>/dev/null | xargs ./vendor/bin/phpcs",
         "phpstan": "./vendor/bin/phpstan analyse",
+        "phpunit": "./vendor/bin/phpunit --bootstrap tests/Bootstrap.php tests/src/MemcachedSessionHandlerTest.php",
         "test": [
             "@phpcs",
-            "@phpstan"
+            "@phpstan",
+            "@phpunit"
         ]
     },
     "config": {

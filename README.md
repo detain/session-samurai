@@ -28,7 +28,7 @@ require 'vendor/autoload.php';  // set up autoloading using composer
 
 $memcached = new \Memcached();  // create connection to memcached
 $memcached->addServer('localhost', 11211);
-$handler = new \Detain\SessionSamurai\Memcached($memcached);
+$handler = new \Detain\SessionSamurai\MemcachedSessionHandler($memcached);
 session_set_save_handler($handler, true);
 ```
 
@@ -48,7 +48,6 @@ session_set_save_handler($handler, true);
 * [ramazancetinkaya/session-handler](https://github.com/ramazancetinkaya/session-handler): A PHP library for secure session handling.
 * [davidlienhard/sessionhandler](https://github.com/davidlienhard/sessionhandler): 🐘 php sessionhandler using database connection
 * [zahycz/sessionless](https://github.com/zahycz/sessionless): Non-I/O blocking SessionHandler implementation using Nette/Caching
-* [detain/session-samurai](https://github.com/detain/session-samurai): A custom PHP session save handler for storing sessions as JSON in memcached.
 * [javis/php-memcached-sessions](https://github.com/javis/php-memcached-sessions): A PHP session handler that uses memcached to store session with multiple servers, failover and replication support.
 * [PHP Cache](https://www.php-cache.com/en/latest/) - PHP-Cache Documentation
 * [The Cache Component](https://symfony.com/doc/current/components/cache.html#available-cache-adapters) (Symfony Docs)
