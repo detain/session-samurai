@@ -2,7 +2,9 @@
 
 namespace Detain\SessionSamuraiTest;
 
-class IlluminateSessionHandlerTest extends PHPUnit_Framework_TestCase
+use Detain\SessionSamurai\IlluminateSessionHandler;
+
+class IlluminateSessionHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Mock object of Illuminate\Session\Store

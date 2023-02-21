@@ -2,14 +2,14 @@
 
 namespace Detain\SessionSamuraiTest;
 
-use Detain\SessionSamurai\Memcached;
+use Detain\SessionSamurai\MemcachedSessionHandler;
 
 /**
  * Tests for memcached session save handler
  *
  * @author Lee Boynton <lee@lboynton.com>
  */
-class MemcachedTest extends \PHPUnit_Framework_TestCase
+class MemcachedTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Memcache
@@ -38,7 +38,7 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
     public function testReadWrite()
     {
         session_start();
-        $saveHandler = new Memcached($this->memcached);
+        $saveHandler = new MemcachedSessionHandler($this->memcached);
         $this->assertTrue($saveHandler->open('savepath', 'sessionname'));
 
         $id = session_id();
@@ -63,7 +63,7 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
     public function testDestroy()
     {
         session_start();
-        $saveHandler = new Memcached($this->memcached);
+        $saveHandler = new MemcachedSessionHandler($this->memcached);
         $saveHandler->open('savepath', 'sessionname');
 
         $id = session_id();
@@ -79,14 +79,14 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
 
     public function testGarbageCollection()
     {
-        $saveHandler = new Memcached($this->memcached);
+        $saveHandler = new MemcachedSessionHandler($this->memcached);
         // should always return true
         $this->assertTrue($saveHandler->gc(-1));
     }
 
     public function testClose()
     {
-        $saveHandler = new Memcached($this->memcached);
+        $saveHandler = new MemcachedSessionHandler($this->memcached);
         // should always return true
         $this->assertTrue($saveHandler->close());
     }

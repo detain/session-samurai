@@ -4,6 +4,7 @@ namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
 use MongoDB\Client;
+use Detain\SessionSamurai\MongoDbSessionHandler;
 
 class MongoDBSessionHandlerTest extends TestCase
 {

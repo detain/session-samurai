@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
-use Fake\MySQLiSessionHandler;
+use Detain\SessionSamurai\MysqliSessionHandler;
 
 final class MySQLiSessionHandlerTest extends TestCase
 {

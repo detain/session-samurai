@@ -3,6 +3,7 @@
 namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
+use Detain\SessionSamurai\OpCacheSessionHandler;
 
 // include your OPCache Session Handler here
 
@@ -15,7 +16,7 @@ class OPCacheSessionHandlerTest extends TestCase
 
     public function setUp(): void
     {
-        $this->handler = new OPCacheSessionHandler();
+        $this->handler = new OpCacheSessionHandler();
     }
 
     public function testSessionOpen()

@@ -5,6 +5,7 @@ namespace Detain\SessionSamuraiTest;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Detain\SessionSamurai\SymfonyCacheSessionHandler;
 
 class SymfonyCacheSessionHandlerTest extends TestCase
 {

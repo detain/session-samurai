@@ -3,6 +3,7 @@
 namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
+use Detain\SessionSamurai\APCuSessionHandler;
 
 class APCuSessionHandlerTest extends TestCase
 {

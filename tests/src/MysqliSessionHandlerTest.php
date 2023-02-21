@@ -2,6 +2,8 @@
 
 namespace Detain\SessionSamuraiTest;
 
+use Detain\SessionSamurai\MysqliiSessionHandler;
+
 class MysqliSessionHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSessionIdInterface()

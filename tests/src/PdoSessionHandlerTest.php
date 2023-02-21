@@ -2,7 +2,8 @@
 
 namespace Detain\SessionSamuraiTest;
 
- use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
+use Detain\SessionSamurai\PDOSessionHandler;
 
 class PdoSessionHandlerTest extends TestCase
 {

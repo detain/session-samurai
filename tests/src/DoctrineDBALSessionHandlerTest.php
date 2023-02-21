@@ -8,6 +8,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\SessionHandlerDBAL;
 use PHPUnit\Framework\TestCase;
+use Detain\SessionSamurai\DoctrineDBALSessionHandler;
 
 class DoctrineDBALSessionHandlerTest extends TestCase
 {

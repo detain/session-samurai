@@ -2,6 +2,8 @@
 
 namespace Detain\SessionSamuraiTest;
 
+use Detain\SessionSamurai\MemcachedSessionHandler;
+
 class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOpen()

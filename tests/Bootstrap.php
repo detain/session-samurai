@@ -16,11 +16,6 @@ $path = array(
 
 set_include_path(implode(PATH_SEPARATOR, $path));
 
-/**
- * Setup autoloading
- */
-include __DIR__ . '/_autoload.php';
-
 /*
  * Load the user-defined test configuration file, if it exists; otherwise, load
  * the default configuration.

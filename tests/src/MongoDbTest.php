@@ -3,6 +3,7 @@
 namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
+use Detain\SessionSamurai\MongoDbSessionHandler;
 
 class MongoDbTest extends TestCase
 {
