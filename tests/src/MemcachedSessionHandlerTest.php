@@ -35,7 +35,7 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $memcachedMock->method('get')
-            ->willReturn('data');
+            ->willReturn('"data"');
 
         $session = new MemcachedSessionHandler($memcachedMock);
 
@@ -101,7 +101,7 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $memcachedMock->method('get')
+        $memcachedMock->method('touch')
             ->willReturn(true);
 
         $session = new MemcachedSessionHandler($memcachedMock);

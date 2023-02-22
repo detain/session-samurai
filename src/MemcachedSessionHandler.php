@@ -62,8 +62,8 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     public function read($id) //: string|false
     //public function read(string $id) //: string|false
     {
-        $_SESSION = json_decode((string) $this->memcached->get($this->prefix . $id), true);
-        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null) {
+        $_SESSION = json_decode($this->memcached->get($this->prefix . $id), true);
+        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null && $_SESSION !== false) {
             return session_encode();
         }
         return '';
@@ -117,7 +117,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     *
     * @return string
     */
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
     //public function create_sid(): string
     {
