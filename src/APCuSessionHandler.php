@@ -4,9 +4,9 @@ namespace Detain\SessionSamurai;
 
 class APCuSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private $ttl;
+    private int $ttl;
 
-    public function __construct($ttl = 1800) {
+    public function __construct(int $ttl = 1800) {
         $this->ttl = $ttl;
     }
 

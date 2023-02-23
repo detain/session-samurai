@@ -6,106 +6,88 @@ use Detain\SessionSamurai\MemcachedSessionHandler;
 
 class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
 {
+    public $memcachedMock;
+
+    public function setUp(): void
+    {
+        session_start();
+        $this->memcachedMock = $this->getMockBuilder('Memcached')->disableOriginalConstructor()->getMock();
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
     public function testOpen()
     {
-        $memcachedMock = $this->getMockBuilder('Memcached')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $session = new MemcachedSessionHandler($memcachedMock);
-
+        $session = new MemcachedSessionHandler($this->memcachedMock);
         $this->assertTrue($session->open('/tmp', 'PHPSESSID'));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testClose()
     {
-        $memcachedMock = $this->getMockBuilder('Memcached')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $session = new MemcachedSessionHandler($memcachedMock);
-
+        $session = new MemcachedSessionHandler($this->memcachedMock);
         $this->assertTrue($session->close());
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testRead()
     {
-        $memcachedMock = $this->getMockBuilder('Memcached')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $memcachedMock->method('get')
-            ->willReturn('"data"');
-
-        $session = new MemcachedSessionHandler($memcachedMock);
-
+        $this->memcachedMock->method('get')->willReturn('"data"');
+        $session = new MemcachedSessionHandler($this->memcachedMock);
         $this->assertEquals('data', $session->read('id'));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testWrite()
     {
-        $memcachedMock = $this->getMockBuilder('Memcached')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $memcachedMock->method('set')
-            ->willReturn(true);
-
-        $session = new MemcachedSessionHandler($memcachedMock);
-
+        $this->memcachedMock->method('set')->willReturn(true);
+        $session = new MemcachedSessionHandler($this->memcachedMock);
         $this->assertTrue($session->write('id', 'data'));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testDestroy()
     {
-        $memcachedMock = $this->getMockBuilder('Memcached')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $memcachedMock->method('delete')
-            ->willReturn(true);
-
-        $session = new MemcachedSessionHandler($memcachedMock);
-
+        $this->memcachedMock->method('delete')->willReturn(true);
+        $session = new MemcachedSessionHandler($this->memcachedMock);
         $this->assertTrue($session->destroy('id'));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testGc()
     {
-        $memcachedMock = $this->getMockBuilder('Memcached')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $session = new MemcachedSessionHandler($memcachedMock);
-
+        $session = new MemcachedSessionHandler($this->memcachedMock);
         $this->assertTrue($session->gc(0));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testValidateId()
     {
-        $memcachedMock = $this->getMockBuilder('Memcached')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $memcachedMock->method('get')
-            ->willReturn('data');
-
-        $session = new MemcachedSessionHandler($memcachedMock);
-
+        $this->memcachedMock->method('get')->willReturn('data');
+        $session = new MemcachedSessionHandler($this->memcachedMock);
         $this->assertEquals('data', $session->validateId('id'));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testUpdateTimestamp()
     {
-        $memcachedMock = $this->getMockBuilder('Memcached')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $memcachedMock->method('touch')
-            ->willReturn(true);
-
-        $session = new MemcachedSessionHandler($memcachedMock);
-
+        $this->memcachedMock->method('touch')->willReturn(true);
+        $session = new MemcachedSessionHandler($this->memcachedMock);
         $this->assertTrue($session->updateTimestamp('id', 'data'));
     }
 }
