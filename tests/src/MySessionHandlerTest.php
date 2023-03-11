@@ -122,5 +122,5 @@ class MySessionHandlerTest extends \PHPUnit\Framework\TestCase
         // Save the session data using the handler
         $this->assertTrue($this->handler->write($sessionId, 'test'));
         $this->assertTrue($this->handler->updateTimestamp($sessionId, 'test'));
-   }
+    }
 }
