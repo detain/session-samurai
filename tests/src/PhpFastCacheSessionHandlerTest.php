@@ -10,13 +10,13 @@ class PhpFastCacheSessionHandlerTest extends TestCase
     protected $handler;
     protected $sessionId;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->handler = new PhpFastCacheSessionHandler();
         $this->sessionId = uniqid();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->handler = null;
         $this->sessionId = null;
@@ -63,7 +63,7 @@ class PhpFastCacheSessionHandlerTest extends TestCase
         $this->assertIsString($sid);
     }
 
-    public function testValidateId()
+    public function testValidateId($key)
     {
         $this->assertTrue($this->handler->validateId($this->sessionId));
     }

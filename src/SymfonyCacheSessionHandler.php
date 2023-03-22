@@ -68,7 +68,12 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         return true;
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
+    public function validateId($id)
+    {
+        return $this->cache->getItem($id);
+    }
+
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
     {
         return md5(uniqid('', true));

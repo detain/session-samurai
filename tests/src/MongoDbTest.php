@@ -9,7 +9,7 @@ class MongoDbTest extends TestCase
 {
     private $sessionHandler;
 
-    public function setUp()
+    public function setUp(): void
     {
         $mongoConnection = new MongoClient();
         $this->sessionHandler = new MongoDBSessionHandler($mongoConnection);

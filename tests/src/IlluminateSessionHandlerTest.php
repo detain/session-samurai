@@ -16,7 +16,7 @@ class IlluminateSessionHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * Set up test with mock object
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->store = $this->getMockBuilder('Illuminate\Session\Store')
             ->disableOriginalConstructor()

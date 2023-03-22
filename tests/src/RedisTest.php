@@ -10,13 +10,13 @@ class RedisTest extends TestCase
 {
     protected $redis;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->redis = new Redis();
         $this->assertTrue($this->redis->connect('127.0.0.1', 6379));
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->redis);
     }

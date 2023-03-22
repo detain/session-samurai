@@ -57,6 +57,12 @@ class PhpFastCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         return true;
     }
 
+    public function validateId($sessionId)
+    {
+        $item = $this->cache->getItem($sessionId);
+        return $item->get();
+    }
+
     public function updateTimestamp($sessionId, $data)
     {
         $item = $this->cache->getItem($sessionId);
@@ -64,7 +70,7 @@ class PhpFastCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         $this->cache->save($item);
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
     {
         return bin2hex(random_bytes(32));
