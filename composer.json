@@ -15,6 +15,9 @@
         "ext-session": "*"
     },
     "require-dev": {
+        "mongodb/mongodb": "*",
+        "influxdata/influxdb-client-php": "*",
+        "league/flysystem": "*",
         "friendsofphp/php-cs-fixer": "*",
         "phpstan/extension-installer": "*",
         "phpstan/phpstan": "*",
@@ -47,7 +50,8 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "php-http/discovery": true
         }
     }
 }

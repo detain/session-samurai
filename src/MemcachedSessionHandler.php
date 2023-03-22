@@ -4,16 +4,13 @@ namespace Detain\SessionSamurai;
 
 class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
+    protected \Memcached $memcached;
+    protected string $sessionName;
     /**
-    * @var Memcached The memcached object
+    * @var string|int|false
     */
-    protected $memcached;
-    protected $sessionName;
     protected $expire;
-    /**
-    * @var string The namespace prefix to prepend to session IDs
-    */
-    protected $prefix = '';
+    protected string $prefix = '';
 
     /**
     * Create new memcached session save handler
@@ -28,7 +25,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     /**
     * Open session
     *
-    * @param string $savePath
+    * @param string $path
     * @param string $name
     * @return boolean
     */
