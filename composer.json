@@ -15,6 +15,12 @@
         "ext-session": "*"
     },
     "require-dev": {
+        "ext-sqlite3": "*",
+        "ext-mysqli": "*",
+        "ext-PDO": "*",
+        "ext-redis": "*",
+        "ext-mongodb": "*",
+        "ext-memcached": "*",
         "mongodb/mongodb": "*",
         "influxdata/influxdb-client-php": "*",
         "league/flysystem": "*",
