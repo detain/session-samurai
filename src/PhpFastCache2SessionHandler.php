@@ -8,7 +8,7 @@ use SessionHandlerInterface;
 use SessionIdInterface;
 use SessionUpdateTimestampHandlerInterface;
 
-class PhpFastCacheSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class PhpFastCache2SessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
     protected $cache;
 

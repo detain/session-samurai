@@ -4,11 +4,11 @@ namespace Detain\SessionSamurai;
 
 class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
-    protected $mysqli;
+    protected $db;
 
-    public function __construct($mysqli)
+    public function __construct(mysqli $db)
     {
-        $this->mysqli = $mysqli;
+        $this->db = $db;
     }
 
     //open a connection to the session storage
@@ -26,7 +26,7 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
     //read the session data for this session
     public function read($sid)
     {
-        $select_statement = $this->mysqli->prepare("SELECT data FROM sessions WHERE sid=?");
+        $select_statement = $this->db->prepare("SELECT data FROM sessions WHERE sid=?");
         $select_statement->bind_param('s', $sid);
         $select_statement->execute();
         $select_statement->bind_result($data);
@@ -38,14 +38,14 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
     //write the session data to the session storage
     public function write($sid, $data)
     {
-        $update_statement = $this->mysqli->prepare("UPDATE sessions SET data=?, timestamp=UNIX_TIMESTAMP() WHERE sid=?");
+        $update_statement = $this->db->prepare("UPDATE sessions SET data=?, timestamp=UNIX_TIMESTAMP() WHERE sid=?");
         $update_statement->bind_param('ss', $data, $sid);
         $update_statement->execute();
 
         if ($update_statement->affected_rows > 0) {
             return true;
         } else {
-            $insert_statement = $this->mysqli->prepare("INSERT INTO sessions (sid, data) VALUES (?, ?)");
+            $insert_statement = $this->db->prepare("INSERT INTO sessions (sid, data) VALUES (?, ?)");
             $insert_statement->bind_param('ss', $sid, $data);
             $insert_statement->execute();
             return $insert_statement->affected_rows > 0;
@@ -55,7 +55,7 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
     //destroy the session data from the session storage
     public function destroy($sid)
     {
-        $delete_statement = $this->mysqli->prepare("DELETE FROM sessions WHERE sid=?");
+        $delete_statement = $this->db->prepare("DELETE FROM sessions WHERE sid=?");
         $delete_statement->bind_param('s', $sid);
         $delete_statement->execute();
         return $delete_statement->affected_rows > 0;
@@ -65,7 +65,7 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
     public function gc($maxLifeTime)
     {
         $timestamp = time() - $maxLifeTime;
-        $delete_statement = $this->mysqli->prepare("DELETE FROM sessions WHERE timestamp < ?");
+        $delete_statement = $this->db->prepare("DELETE FROM sessions WHERE timestamp < ?");
         $delete_statement->bind_param('i', $timestamp);
         $delete_statement->execute();
         return $delete_statement->affected_rows;

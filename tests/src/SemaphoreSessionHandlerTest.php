@@ -9,7 +9,7 @@ class SemaphoreSessionHandlerTest extends TestCase
 {
     private $sessionHandler;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->sessionHandler = new SemaphoreSessionHandler();
     }

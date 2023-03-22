@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionHandlerInter
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionIdInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionUpdateTimestampHandlerInterface;
 
-class SymfonyCacheSessionHandler extends AbstractSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class SymfonyCache2SessionHandler extends AbstractSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
     private $cache;
     private $ttl;

@@ -4,15 +4,15 @@ namespace Detain\SessionSamurai;
 
 class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    protected $handler;
+    protected $db;
 
     /**
     * Session Handler Constructor
     *
     * @param array $info array of information needed to connect to a Mysql DB
     */
-    public function __construct($info) {
-        $this->handler = new mysqli($info['host'], $info['username'], $info['password'], $info['dbname']);
+    public function __construct(mysqli $db) {
+        $this->db = $db;
     }
 
     /**
@@ -39,9 +39,9 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     * @param string $data serialized session data
     */
     public function write($session_id, $data) {
-        $query = sprintf("REPLACE INTO session (id, data, date_created) VALUES ('%s', '%s', NOW())", $this->handler->real_escape_string($session_id), $this->handler->real_escape_string($data));
-        $this->handler->query($query);
-        return $this->handler->affected_rows;
+        $query = sprintf("REPLACE INTO session (id, data, date_created) VALUES ('%s', '%s', NOW())", $this->db->real_escape_string($session_id), $this->db->real_escape_string($data));
+        $this->db->query($query);
+        return $this->db->affected_rows;
     }
 
     /**
@@ -50,8 +50,8 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     * @param string $session_id session id
     */
     public function read($session_id) {
-        $query = sprintf("SELECT data FROM session WHERE id = '%s'", $this->handler->real_escape_string($session_id));
-        if ($result = $this->handler->query($query)) {
+        $query = sprintf("SELECT data FROM session WHERE id = '%s'", $this->db->real_escape_string($session_id));
+        if ($result = $this->db->query($query)) {
             if ($row = $result->fetch_object()) {
                 return $row->data;
             }
@@ -65,9 +65,9 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     * @param string $session_id session id
     */
     public function destroy($session_id) {
-        $query = sprintf("DELETE FROM session WHERE id = '%s'", $this->handler->real_escape_string($session_id));
-        $this->handler->query($query);
-        return $this->handler->affected_rows;
+        $query = sprintf("DELETE FROM session WHERE id = '%s'", $this->db->real_escape_string($session_id));
+        $this->db->query($query);
+        return $this->db->affected_rows;
     }
 
     /**
@@ -77,7 +77,7 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     */
     public function gc($maxLifetime) {
         $query = sprintf('DELETE FROM session WHERE DATE_ADD(date_created, INTERVAL %d SECOND) < NOW()', (int)$maxLifetime);
-        $this->handler->query($query);
-        return $this->handler->affected_rows;
+        $this->db->query($query);
+        return $this->db->affected_rows;
     }
 }

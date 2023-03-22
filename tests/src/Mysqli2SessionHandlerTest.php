@@ -7,7 +7,7 @@ namespace Detain\SessionSamuraiTest;
 use PHPUnit\Framework\TestCase;
 use Detain\SessionSamurai\MysqliSessionHandler;
 
-final class MySQLiSessionHandlerTest extends TestCase
+final class Mysqli2SessionHandlerTest extends TestCase
 {
     /**
      * @dataProvider getDataForRead

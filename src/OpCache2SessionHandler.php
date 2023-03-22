@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class OpcacheSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
     protected $savePath;
 
