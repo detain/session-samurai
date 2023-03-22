@@ -67,6 +67,7 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
             $this->memcached->method('get')->willReturn('"data"');
         }
         $session = new MemcachedSessionHandler($this->memcached);
+        $session->write('id', 'data');
         $this->assertEquals('data', $session->read('id'));
     }
 
