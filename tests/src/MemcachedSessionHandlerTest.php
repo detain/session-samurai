@@ -4,32 +4,58 @@ namespace Detain\SessionSamuraiTest;
 
 use Detain\SessionSamurai\MemcachedSessionHandler;
 
+/**
+ * Tests for memcached session save handler
+ */
 class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    public $memcachedMock;
+    /**
+     * @var \Memcache
+     */
+    protected $memcached;
+    protected $useMock = false;
+
+    /**
+     * @var string
+     */
+    protected $originalSessionSavePath;
 
     public function setUp(): void
     {
+        // fix permission denied warnings by setting to a path we should have write access to
+        $this->originalSessionSavePath = session_save_path();
+        session_save_path('/tmp');
+        if ($this->useMock == true) {
+            $this->memcached = $this->getMockBuilder('Memcached')->disableOriginalConstructor()->getMock();
+        } else {
+            $this->memcached = new \Memcached();
+            $this->memcached->addServer(TESTS_MEMCACHE_HOST, TESTS_MEMCACHE_PORT);
+        }
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testReadWrite()
+    {
         session_start();
-        $this->memcachedMock = $this->getMockBuilder('Memcached')->disableOriginalConstructor()->getMock();
-    }
+        $saveHandler = new MemcachedSessionHandler($this->memcached);
+        $this->assertTrue($saveHandler->open('savepath', 'sessionname'));
 
-    /**
-     * @runInSeparateProcess
-     */
-    public function testOpen()
-    {
-        $session = new MemcachedSessionHandler($this->memcachedMock);
-        $this->assertTrue($session->open('/tmp', 'PHPSESSID'));
-    }
+        $id = session_id();
+        $_SESSION = array('foo' => 'bar', 'bar' => array('foo' => 'bar'));
 
-    /**
-     * @runInSeparateProcess
-     */
-    public function testClose()
-    {
-        $session = new MemcachedSessionHandler($this->memcachedMock);
-        $this->assertTrue($session->close());
+        $this->assertTrue($saveHandler->write($id, session_encode()));
+        $this->assertEquals($_SESSION, json_decode($this->memcached->get("sess-{$id}"), true));
+        $serializedSession = $saveHandler->read($id);
+        $this->assertTrue(!empty($serializedSession));
+
+        $_SESSION = array('foo' => array(1, 2, 3));
+
+        $this->assertTrue($saveHandler->write($id, serialize($_SESSION)));
+        $this->assertEquals($_SESSION, json_decode($this->memcached->get("sess-{$id}"), true));
+        $serializedSession2 = $saveHandler->read($id);
+        $this->assertTrue(!empty($serializedSession2));
     }
 
     /**
@@ -37,8 +63,10 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     public function testRead()
     {
-        $this->memcachedMock->method('get')->willReturn('"data"');
-        $session = new MemcachedSessionHandler($this->memcachedMock);
+        if ($this->useMock == true) {
+            $this->memcached->method('get')->willReturn('"data"');
+        }
+        $session = new MemcachedSessionHandler($this->memcached);
         $this->assertEquals('data', $session->read('id'));
     }
 
@@ -47,8 +75,10 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     public function testWrite()
     {
-        $this->memcachedMock->method('set')->willReturn(true);
-        $session = new MemcachedSessionHandler($this->memcachedMock);
+        if ($this->useMock == true) {
+            $this->memcached->method('set')->willReturn(true);
+        }
+        $session = new MemcachedSessionHandler($this->memcached);
         $this->assertTrue($session->write('id', 'data'));
     }
 
@@ -57,8 +87,60 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     public function testDestroy()
     {
-        $this->memcachedMock->method('delete')->willReturn(true);
-        $session = new MemcachedSessionHandler($this->memcachedMock);
+        session_start();
+        $saveHandler = new MemcachedSessionHandler($this->memcached);
+        $saveHandler->open('savepath', 'sessionname');
+
+        $id = session_id();
+        $_SESSION = array('foo' => 'bar', 'bar' => array('foo' => 'bar'));
+
+        $saveHandler->write($id, serialize($_SESSION));
+        $this->assertEquals($_SESSION, json_decode($this->memcached->get("sess-{$id}"), true));
+
+        $saveHandler->destroy($id);
+        $this->assertEquals('', $saveHandler->read($id));
+        $this->assertFalse($this->memcached->get("sess-{$id}"));
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testGarbageCollection()
+    {
+        $saveHandler = new MemcachedSessionHandler($this->memcached);
+        // should always return true
+        $this->assertTrue($saveHandler->gc(-1));
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testClose()
+    {
+        $saveHandler = new MemcachedSessionHandler($this->memcached);
+        // should always return true
+        $this->assertTrue($saveHandler->close());
+    }
+
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testOpen()
+    {
+        $session = new MemcachedSessionHandler($this->memcached);
+        $this->assertTrue($session->open('/tmp', 'PHPSESSID'));
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testDestroy()
+    {
+        if ($this->useMock == true) {
+            $this->memcached->method('delete')->willReturn(true);
+        }
+        $session = new MemcachedSessionHandler($this->memcached);
         $this->assertTrue($session->destroy('id'));
     }
 
@@ -67,7 +149,7 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     public function testGc()
     {
-        $session = new MemcachedSessionHandler($this->memcachedMock);
+        $session = new MemcachedSessionHandler($this->memcached);
         $this->assertTrue($session->gc(0));
     }
 
@@ -76,8 +158,10 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     public function testValidateId()
     {
-        $this->memcachedMock->method('get')->willReturn('data');
-        $session = new MemcachedSessionHandler($this->memcachedMock);
+        if ($this->useMock == true) {
+            $this->memcached->method('get')->willReturn('data');
+        }
+        $session = new MemcachedSessionHandler($this->memcached);
         $this->assertEquals('data', $session->validateId('id'));
     }
 
@@ -86,8 +170,18 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     public function testUpdateTimestamp()
     {
-        $this->memcachedMock->method('touch')->willReturn(true);
-        $session = new MemcachedSessionHandler($this->memcachedMock);
+        if ($this->useMock == true) {
+            $this->memcached->method('touch')->willReturn(true);
+        }
+        $session = new MemcachedSessionHandler($this->memcached);
         $this->assertTrue($session->updateTimestamp('id', 'data'));
+    }
+
+
+    public function tearDown(): void
+    {
+        $this->memcached->flush();
+        // reset session save path back to default
+        @session_save_path($this->originalSessionSavePath);
     }
 }
