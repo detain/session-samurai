@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class WinCacheSessionHandlerSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
+class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     public function __construct() {
         if (!extension_loaded('wincache')) {

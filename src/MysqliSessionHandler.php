@@ -2,7 +2,7 @@
 
 namespace Detain\SessionSamurai;
 
-class MySqliSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
     protected $mysqli;
 

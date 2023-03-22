@@ -7,7 +7,7 @@ use Detain\SessionSamurai\OpCacheSessionHandler;
 
 // include your OPCache Session Handler here
 
-class OPCacheSessionHandlerTest extends TestCase
+class OpCacheSessionHandlerTest extends TestCase
 {
     /**
      * @var OPCacheSessionHandler
