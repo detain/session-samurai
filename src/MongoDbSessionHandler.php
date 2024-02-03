@@ -7,20 +7,24 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
     protected $mongoConnection;
     protected $sessionCollection;
 
-    public function __construct($mongoConnection) {
+    public function __construct($mongoConnection)
+    {
         $this->mongoConnection = $mongoConnection;
         $this->sessionCollection = new MongoCollection($this->mongoConnection, "sessions");
     }
 
-    public function open($savePath, $sessionName) {
+    public function open($savePath, $sessionName)
+    {
         return true;
     }
 
-    public function close() {
+    public function close()
+    {
         return true;
     }
 
-    public function read($id) {
+    public function read($id)
+    {
         $cursor = $this->sessionCollection->findOne(['_id' => $id], ['data' => true]);
 
         if ($cursor !== null) {
@@ -30,7 +34,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return '';
     }
 
-    public function write($id, $data) {
+    public function write($id, $data)
+    {
         $options = ['upsert' => true];
         $query = ['_id' => $id];
         $update = [
@@ -41,7 +46,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return $result->getModifiedCount() > 0;
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $options = ['w' => 1];
         $query = ['_id' => $id];
         $result = $this->sessionCollection->removeOne($query, $options);
@@ -50,17 +56,20 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
 
     // SessionIdInterface
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    public function create_sid() {
+    public function create_sid()
+    {
         $sid = base64_encode(openssl_random_pseudo_bytes(20));
         return preg_replace("/\W/", "", $sid);
     }
 
     // SessionUpdateTimestampHandlerInterface
-    public function validateId($id) {
+    public function validateId($id)
+    {
         return $this->sessionCollection->count(['_id' => $id]) > 0;
     }
 
-    public function updateTimestamp($id, $timestamp) {
+    public function updateTimestamp($id, $timestamp)
+    {
         $options = ['upsert' => true];
         $query = ['_id' => $id];
         $update = [

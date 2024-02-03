@@ -52,7 +52,7 @@ class PDOSessionHandler implements \SessionHandlerInterface, \SessionIdInterface
         return true;
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
     {
         return uniqid();

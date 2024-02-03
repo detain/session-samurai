@@ -10,15 +10,18 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     private $sessionIdKey = 'semaphore_session_id';
     private $sessionLifetime = 3600;
 
-    public function open($savePath, $sessionName) {
+    public function open($savePath, $sessionName)
+    {
         return true;
     }
 
-    public function close() {
+    public function close()
+    {
         return true;
     }
 
-    public function read($sessionId) {
+    public function read($sessionId)
+    {
         $this->lock = sem_get($sessionId);
         sem_acquire($this->lock);
         $this->sessionId = $sessionId;
@@ -32,7 +35,8 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return '';
     }
 
-    public function write($sessionId, $sessionData) {
+    public function write($sessionId, $sessionData)
+    {
         $this->lock = sem_get($sessionId);
         sem_acquire($this->lock);
         $this->sessionId = $sessionId;
@@ -42,7 +46,8 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return true;
     }
 
-    public function destroy($sessionId) {
+    public function destroy($sessionId)
+    {
         $this->lock = sem_get($sessionId);
         sem_acquire($this->lock);
         $this->sessionId = $sessionId;
@@ -53,12 +58,14 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return true;
     }
 
-    public function gc($maxLifetime) {
+    public function gc($maxLifetime)
+    {
         return true;
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    public function create_sid() {
+    public function create_sid()
+    {
         $sessionId = uniqid();
         $this->lock = sem_get($sessionId);
         sem_acquire($this->lock);
@@ -68,7 +75,8 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return $sessionId;
     }
 
-    public function validateId($sessionId) {
+    public function validateId($sessionId)
+    {
         $this->lock = sem_get($sessionId);
         sem_acquire($this->lock);
         $this->sessionId = $sessionId;
@@ -85,7 +93,8 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return false;
     }
 
-    public function updateTimestamp($sessionId, $sessionData) {
+    public function updateTimestamp($sessionId, $sessionData)
+    {
         $this->lock = sem_get($sessionId);
         sem_acquire($this->lock);
         $this->sessionId = $sessionId;

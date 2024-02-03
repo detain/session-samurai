@@ -6,44 +6,54 @@ class APCuSessionHandler implements \SessionHandlerInterface, \SessionIdInterfac
 {
     private int $ttl;
 
-    public function __construct(int $ttl = 1800) {
+    public function __construct(int $ttl = 1800)
+    {
         $this->ttl = $ttl;
     }
 
-    public function open($savePath, $sessionName) {
+    public function open($savePath, $sessionName)
+    {
         return true;
     }
 
-    public function close() {
+    public function close()
+    {
         return true;
     }
 
-    public function read($sessionId) {
+    public function read($sessionId)
+    {
         return apcu_fetch($sessionId);
     }
 
-    public function write($sessionId, $sessionData) {
+    public function write($sessionId, $sessionData)
+    {
         return apcu_store($sessionId, $sessionData, $this->ttl);
     }
 
-    public function destroy($sessionId) {
+    public function destroy($sessionId)
+    {
         return apcu_delete($sessionId);
     }
 
-    public function gc($maxLifetime) {
+    public function gc($maxLifetime)
+    {
         return true;
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    public function create_sid() {
+    public function create_sid()
+    {
         return bin2hex(random_bytes(16));
     }
 
-    public function validateId($sessionId) {
+    public function validateId($sessionId)
+    {
         return (bool) preg_match('/^[0-9a-f]{32}$/', $sessionId);
     }
 
-    public function updateTimestamp($sessionId, $sessionData) {
+    public function updateTimestamp($sessionId, $sessionData)
+    {
         return true;
     }
 }

@@ -47,7 +47,7 @@ class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandle
         $this->connection->executeQuery('DELETE FROM sessions WHERE session_time < ?', [time() - $maxLifetime]);
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
     {
         return md5(uniqid(mt_rand(), true));

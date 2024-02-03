@@ -43,7 +43,7 @@ class ApcSessionHandler implements \SessionHandlerInterface, \SessionIdInterface
         return true;
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
     {
         $sid = session_create_id();

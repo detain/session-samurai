@@ -47,7 +47,7 @@ class IlluminateSessionHandler implements \SessionHandlerInterface, \SessionIdIn
         $this->handler->gc($maxLifetime);
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
     {
         return $this->manager->driver()->generateSessionId();

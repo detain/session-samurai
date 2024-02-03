@@ -11,7 +11,8 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     *
     * @param array $info array of information needed to connect to a Mysql DB
     */
-    public function __construct(mysqli $db) {
+    public function __construct(mysqli $db)
+    {
         $this->db = $db;
     }
 
@@ -21,14 +22,16 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     * @param string $save_path save path
     * @param string $session_name session name
     */
-    public function open($save_path, $session_name) {
+    public function open($save_path, $session_name)
+    {
         return true;
     }
 
     /**
     * Close Session - Wrapper for SessionHandlerInterface
     */
-    public function close() {
+    public function close()
+    {
         return true;
     }
 
@@ -38,7 +41,8 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     * @param string $session_id session id
     * @param string $data serialized session data
     */
-    public function write($session_id, $data) {
+    public function write($session_id, $data)
+    {
         $query = sprintf("REPLACE INTO session (id, data, date_created) VALUES ('%s', '%s', NOW())", $this->db->real_escape_string($session_id), $this->db->real_escape_string($data));
         $this->db->query($query);
         return $this->db->affected_rows;
@@ -49,7 +53,8 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     *
     * @param string $session_id session id
     */
-    public function read($session_id) {
+    public function read($session_id)
+    {
         $query = sprintf("SELECT data FROM session WHERE id = '%s'", $this->db->real_escape_string($session_id));
         if ($result = $this->db->query($query)) {
             if ($row = $result->fetch_object()) {
@@ -64,7 +69,8 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     *
     * @param string $session_id session id
     */
-    public function destroy($session_id) {
+    public function destroy($session_id)
+    {
         $query = sprintf("DELETE FROM session WHERE id = '%s'", $this->db->real_escape_string($session_id));
         $this->db->query($query);
         return $this->db->affected_rows;
@@ -75,7 +81,8 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     *
     * @param int $maxLifetime the session lifetime in seconds
     */
-    public function gc($maxLifetime) {
+    public function gc($maxLifetime)
+    {
         $query = sprintf('DELETE FROM session WHERE DATE_ADD(date_created, INTERVAL %d SECOND) < NOW()', (int)$maxLifetime);
         $this->db->query($query);
         return $this->db->affected_rows;

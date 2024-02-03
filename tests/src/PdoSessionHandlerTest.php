@@ -15,19 +15,23 @@ class PdoSessionHandlerTest extends TestCase
     /**
      * @before
      */
-    public function setupTestClass(){
+    public function setupTestClass()
+    {
         $this->pdoSessionHandler = new PdoSessionHandler();
     }
 
-    public function testOpen(){
+    public function testOpen()
+    {
         $this->assertTrue($this->pdoSessionHandler->open());
     }
 
-    public function testClose(){
+    public function testClose()
+    {
         $this->assertTrue($this->pdoSessionHandler->close());
     }
 
-    public function testRead(){
+    public function testRead()
+    {
         $data = 'my test data';
         $key =  uniqid();
         $this->pdoSessionHandler->write($key, $data);
@@ -36,13 +40,15 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertEquals($data, $resultData);
     }
 
-    public function testWrite(){
+    public function testWrite()
+    {
         $data = 'my test data';
         $key =  uniqid();
         $this->assertTrue($this->pdoSessionHandler->write($key, $data));
     }
 
-    public function testDestroy(){
+    public function testDestroy()
+    {
         $data = 'my test data';
         $key =  uniqid();
         $this->pdoSessionHandler->write($key, $data);
@@ -50,7 +56,8 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertTrue($this->pdoSessionHandler->destroy($key));
     }
 
-    public function testGarbageCollection(){
+    public function testGarbageCollection()
+    {
         $data = 'my test data';
         $key =  uniqid();
         $this->pdoSessionHandler->write($key, $data);
@@ -58,7 +65,8 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertTrue($this->pdoSessionHandler->gc(0));
     }
 
-    public function testUpdateTimestamp(){
+    public function testUpdateTimestamp()
+    {
         $data = 'my test data';
         $key =  uniqid();
         $this->pdoSessionHandler->write($key, $data);

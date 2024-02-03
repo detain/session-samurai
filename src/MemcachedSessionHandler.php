@@ -79,7 +79,6 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         // note: $data is not used as it has already been serialised by PHP,
         // so we use $_SESSION which is an unserialised version of $data.
         return (bool) $this->memcached->set($this->prefix . $id, json_encode($_SESSION), $this->expire);
-
     }
 
     /**

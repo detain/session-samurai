@@ -6,22 +6,26 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
 {
     protected $savePath;
 
-    public function __construct($savePath) {
+    public function __construct($savePath)
+    {
         $this->savePath = $savePath;
     }
 
-    public function open($savePath, $sessionName) {
+    public function open($savePath, $sessionName)
+    {
         if (!$this->savePath) {
             $this->savePath = $savePath;
         }
         return true;
     }
 
-    public function close() {
+    public function close()
+    {
         return true;
     }
 
-    public function read($sessionId) {
+    public function read($sessionId)
+    {
         $file = $this->savePath . '/sess_' . $sessionId;
         if (!file_exists($file)) {
             return '';
@@ -30,13 +34,15 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         return (string) $data;
     }
 
-    public function write($sessionId, $data) {
+    public function write($sessionId, $data)
+    {
         $file = $this->savePath . '/sess_' . $sessionId;
         $data = opcache_invalidate($file, true);
         return file_put_contents($file, $data) === false ? false : true;
     }
 
-    public function destroy($sessionId) {
+    public function destroy($sessionId)
+    {
         $file = $this->savePath . '/sess_' . $sessionId;
         if (file_exists($file)) {
             unlink($file);
@@ -44,7 +50,8 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         return true;
     }
 
-    public function gc($lifetime) {
+    public function gc($lifetime)
+    {
         foreach (glob($this->savePath . '/sess_*') as $file) {
             if (filemtime($file) + $lifetime < time()) {
                 unlink($file);
@@ -54,15 +61,18 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    public function create_sid() {
+    public function create_sid()
+    {
         return md5(uniqid());
     }
 
-    public function validateId($sessionId) {
+    public function validateId($sessionId)
+    {
         return (bool) preg_match('/^[a-zA-Z0-9]{32}$/', $sessionId);
     }
 
-    public function updateTimestamp($sessionId, $data) {
+    public function updateTimestamp($sessionId, $data)
+    {
         $file = $this->savePath . '/sess_' . $sessionId;
         $data = opcache_invalidate($file, true);
         return file_put_contents($file, $data) === false ? false : true;
