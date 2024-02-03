@@ -84,11 +84,11 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
 
             $qb->insert($this->tableName)
                 ->values(
-                    array(
+                    [
                         'id' => '?',
                         'data' => '?',
                         'time' => $time
-                    )
+                    ]
                 )
                 ->setParameter(0, $sessionId)
                 ->setParameter(1, $data);

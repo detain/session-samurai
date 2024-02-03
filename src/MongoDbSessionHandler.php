@@ -21,7 +21,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
     }
 
     public function read($id) {
-        $cursor = $this->sessionCollection->findOne(array('_id' => $id), array('data' => true));
+        $cursor = $this->sessionCollection->findOne(['_id' => $id], ['data' => true]);
 
         if ($cursor !== null) {
             return $cursor['data'];
@@ -31,19 +31,19 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
     }
 
     public function write($id, $data) {
-        $options = array('upsert' => true);
-        $query = array('_id' => $id);
-        $update = array(
+        $options = ['upsert' => true];
+        $query = ['_id' => $id];
+        $update = [
             'data' => $data,
             'updated_at' => new MongoDBTimestamp()
-        );
-        $result = $this->sessionCollection->updateOne($query, array('$set' => $update), $options);
+        ];
+        $result = $this->sessionCollection->updateOne($query, ['$set' => $update], $options);
         return $result->getModifiedCount() > 0;
     }
 
     public function destroy($id) {
-        $options = array('w' => 1);
-        $query = array('_id' => $id);
+        $options = ['w' => 1];
+        $query = ['_id' => $id];
         $result = $this->sessionCollection->removeOne($query, $options);
         return $result->getDeletedCount() > 0;
     }
@@ -57,16 +57,16 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
 
     // SessionUpdateTimestampHandlerInterface
     public function validateId($id) {
-        return $this->sessionCollection->count(array('_id' => $id)) > 0;
+        return $this->sessionCollection->count(['_id' => $id]) > 0;
     }
 
     public function updateTimestamp($id, $timestamp) {
-        $options = array('upsert' => true);
-        $query = array('_id' => $id);
-        $update = array(
+        $options = ['upsert' => true];
+        $query = ['_id' => $id];
+        $update = [
             'updated_at' => new MongoDBTimestamp()
-        );
-        $result = $this->sessionCollection->updateOne($query, array('$set' => $update), $opts);
+        ];
+        $result = $this->sessionCollection->updateOne($query, ['$set' => $update], $opts);
         return $result->getModifiedCount() > 0;
     }
 }

@@ -43,14 +43,14 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($saveHandler->open('savepath', 'sessionname'));
 
         $id = session_id();
-        $_SESSION = array('foo' => 'bar', 'bar' => array('foo' => 'bar'));
+        $_SESSION = ['foo' => 'bar', 'bar' => ['foo' => 'bar']];
 
         $this->assertTrue($saveHandler->write($id, session_encode()));
         $this->assertEquals($_SESSION, json_decode($this->memcached->get("sess-{$id}"), true));
         $serializedSession = $saveHandler->read($id);
         $this->assertTrue(!empty($serializedSession));
 
-        $_SESSION = array('foo' => array(1, 2, 3));
+        $_SESSION = ['foo' => [1, 2, 3]];
 
         $this->assertTrue($saveHandler->write($id, serialize($_SESSION)));
         $this->assertEquals($_SESSION, json_decode($this->memcached->get("sess-{$id}"), true));
@@ -91,14 +91,14 @@ class MemcachedSessionHandlerTest extends \PHPUnit\Framework\TestCase
         if ($this->useMock == true) {
             $this->memcached->method('delete')->willReturn(true);
             $this->memcached->method('set')->willReturn(true);
-            $this->memcached->method('get')->willReturn(json_encode(array('foo' => 'bar', 'bar' => array('foo' => 'bar'))));
+            $this->memcached->method('get')->willReturn(json_encode(['foo' => 'bar', 'bar' => ['foo' => 'bar']]));
         }
         session_start();
         $saveHandler = new MemcachedSessionHandler($this->memcached);
         $saveHandler->open('savepath', 'sessionname');
 
         $id = session_id();
-        $_SESSION = array('foo' => 'bar', 'bar' => array('foo' => 'bar'));
+        $_SESSION = ['foo' => 'bar', 'bar' => ['foo' => 'bar']];
 
         $saveHandler->write($id, serialize($_SESSION));
         $this->assertEquals($_SESSION, json_decode($this->memcached->get("sess-{$id}"), true));

@@ -9,7 +9,7 @@ class MysqliSessionHandlerTest extends \PHPUnit\Framework\TestCase
     public function testSessionIdInterface()
     {
         $mockHandler = $this->getMockBuilder('MysqlSessionHandler')
-        ->setMethods(array("create_sid", "validateId"))
+        ->setMethods(["create_sid", "validateId"])
         ->getMock();
 
         $mockHandler->expects($this->once())
@@ -32,7 +32,7 @@ class MysqliSessionHandlerTest extends \PHPUnit\Framework\TestCase
     public function testSessionHandlerInterface()
     {
         $mockHandler = $this->getMockBuilder('MysqlSessionHandler')
-        ->setMethods(array("open", "close", "read", "write", "destroy", "gc"))
+        ->setMethods(["open", "close", "read", "write", "destroy", "gc"])
         ->getMock();
 
         $mockHandler->expects($this->once())
@@ -82,7 +82,7 @@ class MysqliSessionHandlerTest extends \PHPUnit\Framework\TestCase
     public function testSessionUpdateTimestampHandlerInterface()
     {
         $mockHandler = $this->getMockBuilder('MysqlSessionHandler')
-        ->setMethods(array("updateTimestamp"))
+        ->setMethods(["updateTimestamp"])
         ->getMock();
 
         $mockHandler->expects($this->once())

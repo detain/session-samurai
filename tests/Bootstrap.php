@@ -8,11 +8,11 @@ $root        = realpath(dirname(__DIR__));
 $coreLibrary = "$root/src";
 $coreTests   = "$root/tests";
 
-$path = array(
+$path = [
     $coreLibrary,
     $coreTests,
     get_include_path(),
-);
+];
 
 set_include_path(implode(PATH_SEPARATOR, $path));
 
