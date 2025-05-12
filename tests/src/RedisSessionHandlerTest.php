@@ -14,7 +14,7 @@ class RedisSessionHandlerTest extends TestCase
     {
         self::$redis = new \Redis();
         self::$redis->connect('127.0.0.1', 6379);
-        self::$sessionId = bin2hex(random_bytes(16));
+        self::$sessionId = bin2hex(random_bytes(32));
     }
 
     public function testOpen()
@@ -42,13 +42,6 @@ class RedisSessionHandlerTest extends TestCase
         $this->assertEquals('test data', $handler->read(self::$sessionId));
     }
 
-    public function testDestroy()
-    {
-        $handler = new RedisSessionHandler(self::$redis);
-        $this->assertTrue($handler->destroy(self::$sessionId));
-        $this->assertEquals('', $handler->read(self::$sessionId));
-    }
-
     public function testGc()
     {
         $handler = new RedisSessionHandler(self::$redis);
@@ -73,6 +66,14 @@ class RedisSessionHandlerTest extends TestCase
     public function testUpdateTimestamp()
     {
         $handler = new RedisSessionHandler(self::$redis);
+        $this->assertTrue($handler->write(self::$sessionId, 'test data'));
         $this->assertTrue($handler->updateTimestamp(self::$sessionId, 'test data'));
+    }
+
+    public function testDestroy()
+    {
+        $handler = new RedisSessionHandler(self::$redis);
+        $this->assertTrue($handler->destroy(self::$sessionId));
+        $this->assertEquals('', $handler->read(self::$sessionId));
     }
 }

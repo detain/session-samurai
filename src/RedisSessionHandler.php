@@ -31,9 +31,9 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     *
     * @throws RuntimeException If unable to connect to Redis.
     */
-    public function __construct(\Redis $redis, int $ttl = 86400)
+    public function __construct(\Redis &$redis, int $ttl = 86400)
     {
-        $this->redis = $redis;
+        $this->redis = &$redis;
         $this->ttl = $ttl;
     }
 
@@ -93,8 +93,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     public function create_sid(): string
     {
         $length = 32;
-        $bytes = random_bytes($length);
-        return bin2hex($bytes);
+        return bin2hex(random_bytes($length));
     }
 
     /**
