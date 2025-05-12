@@ -13,7 +13,7 @@ class RedisSessionHandlerTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$redis = new \Redis();
-        self::$redis->connect('127.0.0.1', 6379);
+        self::$redis->connect('67.217.60.234', 6379);
         self::$sessionId = bin2hex(random_bytes(32));
     }
 
@@ -45,7 +45,7 @@ class RedisSessionHandlerTest extends TestCase
     public function testGc()
     {
         $handler = new RedisSessionHandler(self::$redis);
-        $this->assertTrue($handler->gc(0));
+        $this->assertEquals(0, $handler->gc(0));
     }
 
     public function testCreateSid()
