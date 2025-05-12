@@ -9,39 +9,45 @@ use SessionUpdateTimestampHandlerInterface;
 use InvalidArgumentException;
 use RuntimeException;
 
-
 /**
-* Class RedisSessionHandler
-*
-* A session handler that stores PHP session data in Redis.
-*/
+ * Class RedisSessionHandler
+ *
+ * A session handler that stores PHP session data in Redis.
+ */
 class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
     /** @var Redis */
     private Redis $redis;
 
-    /** @var int Session lifetime in seconds */
+    /** @var int Session ttl in seconds */
     private int $ttl;
 
+    /** @var string Prefix for all session keys in Redis */
+    private string $keyPrefix;
+
     /**
-    * RedisSessionHandler constructor.
-    *
-    * @param \Redis $redis     An existing Redis connection
-    * @param int $ttl Session lifetime in seconds (defaults to 86400)
-    *
-    * @throws RuntimeException If unable to connect to Redis.
-    */
-    public function __construct(\Redis &$redis, int $ttl = 86400)
-    {
+     * RedisSessionHandler constructor.
+     *
+     * @param Redis|null $redis     An existing Redis connection (optional).
+     * @param string     $host      Redis host (used if no $redis provided).
+     * @param int        $port      Redis port.
+     * @param int|null   $ttl  Session ttl in seconds (defaults to ini setting).
+     * @param string     $keyPrefix Key prefix to isolate sessions.
+     *
+     * @throws RuntimeException If unable to connect to Redis.
+     */
+    public function __construct(Redis &$redis, int $ttl = 86400, string $keyPrefix = 'PHPREDIS_SESSION:') {
         $this->redis = &$redis;
         $this->ttl = $ttl;
+        $this->keyPrefix = $keyPrefix;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function open($save_path, $session_name): bool
+    public function open(string $savePath, string $sessionName): bool
     {
+        // Nothing to do since connection is done in constructor.
         return true;
     }
 
@@ -50,65 +56,74 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
      */
     public function close(): bool
     {
+        return $this->redis->close();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function read(string $sessionId): string
+    {
+        $data = $this->redis->get($this->keyPrefix . $sessionId);
+        return $data === false ? '' : $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function write(string $sessionId, string $data): bool
+    {
+        $key = $this->keyPrefix . $sessionId;
+        // Use SETEX to write data and expiry at once
+        return (bool) $this->redis->setex($key, $this->ttl, $data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function destroy(string $sessionId): bool
+    {
+        $this->redis->del($this->keyPrefix . $sessionId);
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function read($session_id): string
+    public function gc(int $maxttl): bool
     {
-        $data = $this->redis->get($session_id);
-        return $data !== false ? $data : '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function write($session_id, $session_data): bool
-    {
-        return $this->redis->setex($session_id, $this->ttl, $session_data);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function destroy($session_id): bool
-    {
-        return $this->redis->del($session_id) > 0;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function gc($maxlifetime)
-    {
+        // Redis handles expiry automatically via TTL; no action needed.
         return true;
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     /**
      * {@inheritdoc}
      */
     public function create_sid(): string
     {
-        $length = 32;
-        return bin2hex(random_bytes($length));
+        // Generate a 32‐byte random ID, hex‐encoded, for 64 chars.
+        return bin2hex(random_bytes(32));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validateId($session_id): bool
+    public function validateId(string $sessionId): bool
     {
-        return ctype_xdigit($session_id) && strlen($session_id) === 64;
+        // Check existence without resetting TTL
+        return $this->redis->exists($this->keyPrefix . $sessionId) === 1;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateTimestamp($session_id, $session_data): bool
+    public function updateTimestamp(string $sessionId, string $data): bool
     {
-        return $this->redis->expire($session_id, $this->ttl);
+        $key = $this->keyPrefix . $sessionId;
+        if (!$this->redis->exists($key)) {
+            return false;
+        }
+        // Only update TTL, do not rewrite the payload
+        return (bool) $this->redis->expire($key, $this->ttl);
     }
 }
