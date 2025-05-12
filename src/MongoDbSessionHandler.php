@@ -54,6 +54,11 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return $result->getDeletedCount() > 0;
     }
 
+    public function gc($maxlifetime): bool
+    {
+        return true;
+    }
+
     // SessionIdInterface
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
