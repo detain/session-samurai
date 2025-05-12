@@ -45,7 +45,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function open(string $savePath, string $sessionName): bool
+    public function open($savePath, $sessionName)
     {
         // Nothing to do since connection is done in constructor.
         return true;
@@ -54,7 +54,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function close(): bool
+    public function close()
     {
         return $this->redis->close();
     }
@@ -62,7 +62,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function read(string $sessionId): string
+    public function read($sessionId)
     {
         $data = $this->redis->get($this->keyPrefix . $sessionId);
         return $data === false ? '' : $data;
@@ -71,7 +71,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function write(string $sessionId, string $data): bool
+    public function write($sessionId, $data)
     {
         $key = $this->keyPrefix . $sessionId;
         // Use SETEX to write data and expiry at once
@@ -81,7 +81,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function destroy(string $sessionId): bool
+    public function destroy($sessionId)
     {
         $this->redis->del($this->keyPrefix . $sessionId);
         return true;
@@ -90,7 +90,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function gc(int $maxttl): bool
+    public function gc($maxttl)
     {
         // Redis handles expiry automatically via TTL; no action needed.
         return true;
@@ -99,7 +99,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function create_sid(): string
+    public function create_sid()
     {
         // Generate a 32‐byte random ID, hex‐encoded, for 64 chars.
         return bin2hex(random_bytes(32));
@@ -108,7 +108,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function validateId(string $sessionId): bool
+    public function validateId($sessionId)
     {
         // Check existence without resetting TTL
         return $this->redis->exists($this->keyPrefix . $sessionId) === 1;
@@ -117,7 +117,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function updateTimestamp(string $sessionId, string $data): bool
+    public function updateTimestamp($sessionId, $data)
     {
         $key = $this->keyPrefix . $sessionId;
         if (!$this->redis->exists($key)) {
