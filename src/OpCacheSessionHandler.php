@@ -9,7 +9,7 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
     public function __construct()
     {
         // Initialize the OpCache extension
-        opcache_reset();
+        \opcache_reset();
     }
 
     /**
@@ -33,7 +33,7 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
      */
     public function read($sessionId)
     {
-        $cached = opcache_get($sessionId);
+        $cached = \opcache_get($sessionId);
         if ($cached === false) {
             return '';
         }
@@ -45,8 +45,8 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
      */
     public function write($sessionId, $sessionData): bool
     {
-        opcache_compile_file(__FILE__);
-        opcache_set($sessionId, ['payload' => $sessionData]);
+        \opcache_compile_file(__FILE__);
+        \opcache_set($sessionId, ['payload' => $sessionData]);
         return true;
     }
 
@@ -55,7 +55,7 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
      */
     public function destroy($sessionId): bool
     {
-        opcache_delete($sessionId);
+        \opcache_delete($sessionId);
         return true;
     }
 
@@ -82,7 +82,7 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
      */
     public function validateId($sessionId)
     {
-        $cached = opcache_get($sessionId);
+        $cached = \opcache_get($sessionId);
         return $cached !== false;
     }
 
@@ -91,9 +91,9 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
      */
     public function updateTimestamp($sessionId, $sessionData)
     {
-        $cached = opcache_get($sessionId);
+        $cached = \opcache_get($sessionId);
         if ($cached !== false) {
-            opcache_set($sessionId, ['payload' => $sessionData]);
+            \opcache_set($sessionId, ['payload' => $sessionData]);
         }
         return true;
     }
