@@ -11,7 +11,7 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         $this->savePath = $savePath;
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         if (!$this->savePath) {
             $this->savePath = $savePath;
@@ -19,7 +19,7 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -34,14 +34,14 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         return (string) $data;
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $file = $this->savePath . '/sess_' . $sessionId;
         $data = opcache_invalidate($file, true);
         return file_put_contents($file, $data) === false ? false : true;
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $file = $this->savePath . '/sess_' . $sessionId;
         if (file_exists($file)) {

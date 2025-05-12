@@ -18,12 +18,12 @@ class PhpFastCache2SessionHandler implements SessionHandlerInterface, SessionIdI
         $this->cache->driver()->setPath(sys_get_temp_dir());
     }
 
-    public function open($save_path, $session_name)
+    public function open($save_path, $session_name): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -33,14 +33,14 @@ class PhpFastCache2SessionHandler implements SessionHandlerInterface, SessionIdI
         return $this->cache->getItem($session_id)->get();
     }
 
-    public function write($session_id, $session_data)
+    public function write($session_id, $session_data): bool
     {
         $item = $this->cache->getItem($session_id)->set($session_data);
         $item->expiresAfter(ini_get('session.gc_maxlifetime'));
         return $this->cache->save($item);
     }
 
-    public function destroy($session_id)
+    public function destroy($session_id): bool
     {
         return $this->cache->deleteItem($session_id);
     }

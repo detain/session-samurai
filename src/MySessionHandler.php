@@ -6,13 +6,13 @@ class MySessionHandler implements \SessionHandlerInterface, \SessionIdInterface,
 {
     private $savePath;
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         $this->savePath = $savePath;
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -26,13 +26,13 @@ class MySessionHandler implements \SessionHandlerInterface, \SessionIdInterface,
         return '';
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $sessionFile = $this->savePath . '/sess_' . $sessionId;
         return file_put_contents($sessionFile, $data) !== false;
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $sessionFile = $this->savePath . '/sess_' . $sessionId;
         if (file_exists($sessionFile)) {

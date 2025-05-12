@@ -21,12 +21,12 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         $this->prefix = $prefix;
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -43,7 +43,7 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         return $data->get();
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $key = $this->prefix . $sessionId;
         $item = $this->cache->getItem($key);
@@ -56,7 +56,7 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         return $this->cache->save($item);
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $key = $this->prefix . $sessionId;
 

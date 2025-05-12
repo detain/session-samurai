@@ -13,12 +13,12 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         $this->sessionCollection = new MongoCollection($this->mongoConnection, "sessions");
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }

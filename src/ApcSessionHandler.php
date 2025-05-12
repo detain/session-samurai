@@ -13,12 +13,12 @@ class ApcSessionHandler implements \SessionHandlerInterface, \SessionIdInterface
         $this->prefix = $prefix;
     }
 
-    public function open($save_path, $session_name)
+    public function open($save_path, $session_name): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -28,12 +28,12 @@ class ApcSessionHandler implements \SessionHandlerInterface, \SessionIdInterface
         return apc_fetch($this->prefix . $session_id);
     }
 
-    public function write($session_id, $session_data)
+    public function write($session_id, $session_data): bool
     {
         return apc_store($this->prefix . $session_id, $session_data, $this->lifetime);
     }
 
-    public function destroy($session_id)
+    public function destroy($session_id): bool
     {
         return apc_delete($this->prefix . $session_id);
     }

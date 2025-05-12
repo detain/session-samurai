@@ -8,14 +8,14 @@ class SQLite3SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     private $table = 'sessions';
     private $lifetime = 1440;
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         $this->db = new SQLite3($savePath . '/' . $sessionName . '.db');
         $this->db->exec("CREATE TABLE IF NOT EXISTS {$this->table} (id TEXT PRIMARY KEY, data TEXT, timestamp INTEGER)");
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         $this->db->close();
         return true;
@@ -31,7 +31,7 @@ class SQLite3SessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return $data['data'] ?? '';
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $stmt = $this->db->prepare("REPLACE INTO {$this->table} (id, data, timestamp) VALUES (:id, :data, :timestamp)");
         $stmt->bindValue(':id', $sessionId, SQLITE3_TEXT);
@@ -41,7 +41,7 @@ class SQLite3SessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return true;
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
         $stmt->bindValue(':id', $sessionId, SQLITE3_TEXT);

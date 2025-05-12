@@ -19,12 +19,12 @@ class SymfonyCache2SessionHandler extends AbstractSessionHandler implements Sess
         $this->ttl = $ttl;
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -38,7 +38,7 @@ class SymfonyCache2SessionHandler extends AbstractSessionHandler implements Sess
         return $item->get();
     }
 
-    public function write($sessionId, $sessionData)
+    public function write($sessionId, $sessionData): bool
     {
         $item = $this->cache->getItem($sessionId);
         $item->set($sessionData);
@@ -48,7 +48,7 @@ class SymfonyCache2SessionHandler extends AbstractSessionHandler implements Sess
         return $this->cache->save($item);
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         return $this->cache->deleteItem($sessionId);
     }

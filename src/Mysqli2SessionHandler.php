@@ -22,7 +22,7 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     * @param string $save_path save path
     * @param string $session_name session name
     */
-    public function open($save_path, $session_name)
+    public function open($save_path, $session_name): bool
     {
         return true;
     }
@@ -30,7 +30,7 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     /**
     * Close Session - Wrapper for SessionHandlerInterface
     */
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -69,7 +69,7 @@ class Mysqli2SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     *
     * @param string $session_id session id
     */
-    public function destroy($session_id)
+    public function destroy($session_id): bool
     {
         $query = sprintf("DELETE FROM session WHERE id = '%s'", $this->db->real_escape_string($session_id));
         $this->db->query($query);

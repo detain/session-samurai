@@ -23,12 +23,12 @@ class PhpFastCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         $this->cache = CacheManager::getInstance('files', $cacheConfig);
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -39,7 +39,7 @@ class PhpFastCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         return $item->get();
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $item = $this->cache->getItem($sessionId);
         $item->set($data);
@@ -47,7 +47,7 @@ class PhpFastCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         $this->cache->save($item);
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $this->cache->deleteItem($sessionId);
     }

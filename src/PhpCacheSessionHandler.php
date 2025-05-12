@@ -20,12 +20,12 @@ class PhpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         $this->lifetime = $lifetime;
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -37,12 +37,12 @@ class PhpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         return $data !== false ? $data : '';
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         return $this->cache->set($this->prefix . $sessionId, $data, $this->lifetime);
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         return $this->cache->delete($this->prefix . $sessionId);
     }

@@ -11,12 +11,12 @@ class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         }
     }
 
-    public function open($save_path, $session_name)
+    public function open($save_path, $session_name): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -26,12 +26,12 @@ class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         return wincache_ucache_get($session_id);
     }
 
-    public function write($session_id, $session_data)
+    public function write($session_id, $session_data): bool
     {
         return wincache_ucache_set($session_id, $session_data, ini_get('session.gc_maxlifetime'));
     }
 
-    public function destroy($session_id)
+    public function destroy($session_id): bool
     {
         wincache_ucache_delete($session_id);
         return true;

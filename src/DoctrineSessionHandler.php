@@ -27,7 +27,7 @@ class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandle
         );
     }
 
-    public function write($sessionId, $sessionData)
+    public function write($sessionId, $sessionData): bool
     {
         $sql = 'INSERT INTO sessions (session_id, session_data, session_time) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE session_data = VALUES(session_data), session_time = VALUES(session_time)';
         $stmt = $this->connection->prepare($sql);
@@ -37,7 +37,7 @@ class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandle
         $stmt->execute();
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $this->connection->executeQuery('DELETE FROM sessions WHERE session_id = ?', [$sessionId]);
     }

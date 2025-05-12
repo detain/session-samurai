@@ -21,13 +21,13 @@ class InfluxDbSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         $this->measurement = $measurement;
     }
 
-    public function open($save_path, $session_name)
+    public function open($save_path, $session_name): bool
     {
         // No action necessary because connection is established in constructor
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         // No action necessary because connection is closed in destructor
         return true;
@@ -43,7 +43,7 @@ class InfluxDbSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         }
     }
 
-    public function write($session_id, $session_data)
+    public function write($session_id, $session_data): bool
     {
         $point = new Point(
             $this->measurement,
@@ -56,7 +56,7 @@ class InfluxDbSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         return true;
     }
 
-    public function destroy($session_id)
+    public function destroy($session_id): bool
     {
         $this->client->query("DELETE FROM {$this->measurement} WHERE session_id = '$session_id'", $this->database);
         return true;

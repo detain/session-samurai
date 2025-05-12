@@ -23,7 +23,7 @@ class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -37,14 +37,14 @@ class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return $this->filesystem->read($session_path);
     }
 
-    public function write($session_id, $session_data)
+    public function write($session_id, $session_data): bool
     {
         $session_path = $this->getSessionPath($session_id);
         $this->filesystem->put($session_path, $session_data);
         return true;
     }
 
-    public function destroy($session_id)
+    public function destroy($session_id): bool
     {
         $session_path = $this->getSessionPath($session_id);
         if ($this->filesystem->has($session_path)) {

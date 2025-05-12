@@ -11,13 +11,13 @@ class Mysqli3SessionHandler implements SessionHandlerInterface, SessionIdInterfa
         $this->db = $db;
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         // no action required here
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         $this->db->close();
         return true;
@@ -34,7 +34,7 @@ class Mysqli3SessionHandler implements SessionHandlerInterface, SessionIdInterfa
         return $result;
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $stmt = $this->db->prepare("REPLACE INTO sessions (id, data, last_updated) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $sessionId, $data, time());
@@ -43,7 +43,7 @@ class Mysqli3SessionHandler implements SessionHandlerInterface, SessionIdInterfa
         return $result;
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $stmt = $this->db->prepare("DELETE FROM sessions WHERE id = ?");
         $stmt->bind_param("s", $sessionId);

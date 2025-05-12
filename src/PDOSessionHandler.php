@@ -11,13 +11,13 @@ class PDOSessionHandler implements \SessionHandlerInterface, \SessionIdInterface
         $this->pdo = $pdo;
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         // No action needed since PDO handles the connection.
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         // No action needed since PDO handles the connection.
         return true;
@@ -31,14 +31,14 @@ class PDOSessionHandler implements \SessionHandlerInterface, \SessionIdInterface
         return $row ? $row['data'] : '';
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $statement = $this->pdo->prepare("REPLACE INTO sessions (id, data, updated_at) VALUES (:id, :data, :updated_at)");
         $statement->execute(['id' => $sessionId, 'data' => $data, 'updated_at' => time()]);
         return true;
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $statement = $this->pdo->prepare("DELETE FROM sessions WHERE id = :id");
         $statement->execute(['id' => $sessionId]);

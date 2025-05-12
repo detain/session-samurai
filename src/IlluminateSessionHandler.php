@@ -17,12 +17,12 @@ class IlluminateSessionHandler implements \SessionHandlerInterface, \SessionIdIn
         $this->handler = $this->manager->driver()->getHandler();
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -32,12 +32,12 @@ class IlluminateSessionHandler implements \SessionHandlerInterface, \SessionIdIn
         return $this->handler->read($sessionId);
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $this->handler->write($sessionId, $data);
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $this->handler->destroy($sessionId);
     }

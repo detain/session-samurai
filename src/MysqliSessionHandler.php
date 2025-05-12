@@ -18,7 +18,7 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
     }
 
     //close the connection to the session storage
-    public function close()
+    public function close(): bool
     {
         return true;
     }

@@ -27,7 +27,7 @@ class Redis2SessionHandler implements \SessionHandlerInterface, \SessionIdInterf
     }
 
     // Closes the session
-    public function close()
+    public function close(): bool
     {
         if (!$this->isChanged) {
             return true;
@@ -40,7 +40,7 @@ class Redis2SessionHandler implements \SessionHandlerInterface, \SessionIdInterf
     }
 
     // Destroys n active session
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $this->redis->del($sessionId);
     }
@@ -67,7 +67,7 @@ class Redis2SessionHandler implements \SessionHandlerInterface, \SessionIdInterf
     }
 
     // Writes data to the active session
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $this->isChanged = true;
         $this->sessionId = $sessionId;

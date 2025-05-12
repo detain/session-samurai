@@ -28,12 +28,12 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
         }
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -56,7 +56,7 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
         return '';
     }
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $time = time();
 
@@ -99,7 +99,7 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
         return true;
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->delete($this->tableName)

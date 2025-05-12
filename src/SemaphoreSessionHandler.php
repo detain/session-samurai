@@ -10,12 +10,12 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     private $sessionIdKey = 'semaphore_session_id';
     private $sessionLifetime = 3600;
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -35,7 +35,7 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return '';
     }
 
-    public function write($sessionId, $sessionData)
+    public function write($sessionId, $sessionData): bool
     {
         $this->lock = sem_get($sessionId);
         sem_acquire($this->lock);
@@ -46,7 +46,7 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return true;
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $this->lock = sem_get($sessionId);
         sem_acquire($this->lock);

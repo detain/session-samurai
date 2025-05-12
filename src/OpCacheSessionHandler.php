@@ -12,12 +12,12 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         opcache_reset();
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -31,14 +31,14 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return $cached['payload'];
     }
 
-    public function write($sessionId, $sessionData)
+    public function write($sessionId, $sessionData): bool
     {
         opcache_compile_file(__FILE__);
         opcache_set($sessionId, ['payload' => $sessionData]);
         return true;
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         opcache_delete($sessionId);
         return true;

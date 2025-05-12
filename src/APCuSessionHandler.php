@@ -11,12 +11,12 @@ class APCuSessionHandler implements \SessionHandlerInterface, \SessionIdInterfac
         $this->ttl = $ttl;
     }
 
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -26,12 +26,12 @@ class APCuSessionHandler implements \SessionHandlerInterface, \SessionIdInterfac
         return apcu_fetch($sessionId);
     }
 
-    public function write($sessionId, $sessionData)
+    public function write($sessionId, $sessionData): bool
     {
         return apcu_store($sessionId, $sessionData, $this->ttl);
     }
 
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         return apcu_delete($sessionId);
     }
