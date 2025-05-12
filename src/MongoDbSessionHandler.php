@@ -13,16 +13,25 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         $this->sessionCollection = new MongoCollection($this->mongoConnection, "sessions");
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($id)
     {
         $cursor = $this->sessionCollection->findOne(['_id' => $id], ['data' => true]);
@@ -34,6 +43,9 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($id, $data)
     {
         $options = ['upsert' => true];
@@ -46,6 +58,9 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return $result->getModifiedCount() > 0;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($id)
     {
         $options = ['w' => 1];
@@ -54,6 +69,9 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return $result->getDeletedCount() > 0;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxlifetime): bool
     {
         return true;
@@ -61,6 +79,9 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
 
     // SessionIdInterface
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         $sid = base64_encode(openssl_random_pseudo_bytes(20));
@@ -68,11 +89,17 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
     }
 
     // SessionUpdateTimestampHandlerInterface
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($id)
     {
         return $this->sessionCollection->count(['_id' => $id]) > 0;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($id, $timestamp)
     {
         $options = ['upsert' => true];

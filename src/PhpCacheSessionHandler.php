@@ -20,16 +20,25 @@ class PhpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         $this->lifetime = $lifetime;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $data = $this->cache->get($this->prefix . $sessionId);
@@ -37,32 +46,50 @@ class PhpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         return $data !== false ? $data : '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $data): bool
     {
         return $this->cache->set($this->prefix . $sessionId, $data, $this->lifetime);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         return $this->cache->delete($this->prefix . $sessionId);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxLifetime)
     {
         return true;
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return uniqid($this->prefix);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         return preg_match('/^[a-zA-Z0-9,\-]{1,128}$/', $sessionId);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $sessionData)
     {
         return true;

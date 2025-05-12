@@ -11,18 +11,27 @@ class Mysqli3SessionHandler implements SessionHandlerInterface, SessionIdInterfa
         $this->db = $db;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         // no action required here
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         $this->db->close();
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $stmt = $this->db->prepare("SELECT data FROM sessions WHERE id = ?");
@@ -34,6 +43,9 @@ class Mysqli3SessionHandler implements SessionHandlerInterface, SessionIdInterfa
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $data): bool
     {
         $stmt = $this->db->prepare("REPLACE INTO sessions (id, data, last_updated) VALUES (?, ?, ?)");
@@ -43,6 +55,9 @@ class Mysqli3SessionHandler implements SessionHandlerInterface, SessionIdInterfa
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         $stmt = $this->db->prepare("DELETE FROM sessions WHERE id = ?");
@@ -52,6 +67,9 @@ class Mysqli3SessionHandler implements SessionHandlerInterface, SessionIdInterfa
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxLifetime)
     {
         $stmt = $this->db->prepare("DELETE FROM sessions WHERE last_updated < ?");
@@ -62,11 +80,17 @@ class Mysqli3SessionHandler implements SessionHandlerInterface, SessionIdInterfa
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return bin2hex(random_bytes(16));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM sessions WHERE id = ?");
@@ -78,6 +102,9 @@ class Mysqli3SessionHandler implements SessionHandlerInterface, SessionIdInterfa
         return $count > 0;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $sessionData)
     {
         $stmt = $this->db->prepare("UPDATE sessions SET last_updated = ? WHERE id = ?");

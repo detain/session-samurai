@@ -18,16 +18,25 @@ class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         $this->path = $path;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($save_path, $name)
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($session_id)
     {
         $session_path = $this->getSessionPath($session_id);
@@ -37,6 +46,9 @@ class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return $this->filesystem->read($session_path);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($session_id, $session_data): bool
     {
         $session_path = $this->getSessionPath($session_id);
@@ -44,6 +56,9 @@ class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($session_id): bool
     {
         $session_path = $this->getSessionPath($session_id);
@@ -53,6 +68,9 @@ class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxlifetime)
     {
         $expired_time = time() - $maxlifetime;
@@ -66,17 +84,26 @@ class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return md5(uniqid());
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($session_id)
     {
         $session_path = $this->getSessionPath($session_id);
         return $this->filesystem->has($session_path);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($session_id, $session_data)
     {
         $session_path = $this->getSessionPath($session_id);

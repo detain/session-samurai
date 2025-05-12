@@ -28,16 +28,25 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $qb = $this->connection->createQueryBuilder();
@@ -56,6 +65,9 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
         return '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $data): bool
     {
         $time = time();
@@ -99,6 +111,9 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         $qb = $this->connection->createQueryBuilder();
@@ -111,6 +126,9 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($lifetime)
     {
         // Delete all records that are older than the lifetime
@@ -124,6 +142,9 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         $qb = $this->connection->createQueryBuilder();
@@ -141,6 +162,9 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $sessionData)
     {
         $time = time();

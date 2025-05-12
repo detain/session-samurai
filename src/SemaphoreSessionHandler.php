@@ -10,16 +10,25 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     private $sessionIdKey = 'semaphore_session_id';
     private $sessionLifetime = 3600;
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $this->lock = sem_get($sessionId);
@@ -35,6 +44,9 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $sessionData): bool
     {
         $this->lock = sem_get($sessionId);
@@ -46,6 +58,9 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         $this->lock = sem_get($sessionId);
@@ -58,12 +73,18 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxLifetime)
     {
         return true;
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         $sessionId = uniqid();
@@ -75,6 +96,9 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return $sessionId;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         $this->lock = sem_get($sessionId);
@@ -93,6 +117,9 @@ class SemaphoreSessionHandler implements \SessionHandlerInterface, \SessionIdInt
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $sessionData)
     {
         $this->lock = sem_get($sessionId);

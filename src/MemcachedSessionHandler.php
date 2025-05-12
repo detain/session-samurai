@@ -30,6 +30,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     * @return boolean
     */
     //public function open(string $path, string $name): bool
+    /**
+     * {@inheritdoc}
+     */
     public function open($path, $name)
     {
         // Note: session save path is not used
@@ -43,6 +46,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     *
     * @return boolean
     */
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         // return value should be true for success or false for failure
@@ -56,6 +62,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     * @return string|false
     */
     #[\ReturnTypeWillChange]
+    /**
+     * {@inheritdoc}
+     */
     public function read($id) //: string|false
     //public function read(string $id) //: string|false
     {
@@ -73,6 +82,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     * @param string $data
     * @return boolean
     */
+    /**
+     * {@inheritdoc}
+     */
     public function write($id, $data)
     //public function write(string $id, string $data): bool
     {
@@ -87,6 +99,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     * @param string $id
     * @return boolean
     */
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($id)
     //public function destroy(string $id): bool
     {
@@ -100,6 +115,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     * @return int|false true successs false failure?
     */
     #[\ReturnTypeWillChange]
+    /**
+     * {@inheritdoc}
+     */
     public function gc($max_lifetime) //: int|false
     //public function gc(int $max_lifetime) //: int|false
     {
@@ -114,6 +132,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     * @return string
     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     //public function create_sid(): string
     {
@@ -134,6 +155,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     * @param string $data
     * @return bool
     */
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($id, $data)
     //public function updateTimestamp(string $id, string $data): bool
     {
@@ -149,6 +173,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     * @param string $id
     * @return bool
     */
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($id)
     //public function validateId(string $id): bool
     {

@@ -19,16 +19,25 @@ class SymfonyCache2SessionHandler extends AbstractSessionHandler implements Sess
         $this->ttl = $ttl;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $item = $this->cache->getItem($sessionId);
@@ -38,6 +47,9 @@ class SymfonyCache2SessionHandler extends AbstractSessionHandler implements Sess
         return $item->get();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $sessionData): bool
     {
         $item = $this->cache->getItem($sessionId);
@@ -48,11 +60,17 @@ class SymfonyCache2SessionHandler extends AbstractSessionHandler implements Sess
         return $this->cache->save($item);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         return $this->cache->deleteItem($sessionId);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxlifetime)
     {
         // The garbage collector is handled automatically by the cache implementation.
@@ -60,11 +78,17 @@ class SymfonyCache2SessionHandler extends AbstractSessionHandler implements Sess
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return bin2hex(random_bytes(32));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $sessionData)
     {
         $item = $this->cache->getItem($sessionId);

@@ -21,16 +21,25 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         $this->prefix = $prefix;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $key = $this->prefix . $sessionId;
@@ -43,6 +52,9 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         return $data->get();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $data): bool
     {
         $key = $this->prefix . $sessionId;
@@ -56,6 +68,9 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         return $this->cache->save($item);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         $key = $this->prefix . $sessionId;
@@ -63,22 +78,34 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         return $this->cache->deleteItem($key);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxLifetime)
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($id)
     {
         return $this->cache->getItem($id);
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return md5(uniqid('', true));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $data)
     {
         return $this->write($sessionId, $data);

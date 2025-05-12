@@ -8,6 +8,9 @@ class SQLite3SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     private $table = 'sessions';
     private $lifetime = 1440;
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         $this->db = new SQLite3($savePath . '/' . $sessionName . '.db');
@@ -15,12 +18,18 @@ class SQLite3SessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         $this->db->close();
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $stmt = $this->db->prepare("SELECT data FROM {$this->table} WHERE id = :id AND timestamp >= :timestamp");
@@ -31,6 +40,9 @@ class SQLite3SessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return $data['data'] ?? '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $data): bool
     {
         $stmt = $this->db->prepare("REPLACE INTO {$this->table} (id, data, timestamp) VALUES (:id, :data, :timestamp)");
@@ -41,6 +53,9 @@ class SQLite3SessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
@@ -49,6 +64,9 @@ class SQLite3SessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxlifetime)
     {
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE timestamp < :timestamp");
@@ -58,16 +76,25 @@ class SQLite3SessionHandler implements \SessionHandlerInterface, \SessionIdInter
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return uniqid();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         return preg_match('/^[a-f\d]{32}$/i', $sessionId);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $sessionData)
     {
         $stmt = $this->db->prepare("UPDATE {$this->table} SET timestamp = :timestamp WHERE id = :id");

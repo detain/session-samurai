@@ -12,18 +12,27 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
     }
 
     //open a connection to the session storage
+    /**
+     * {@inheritdoc}
+     */
     public function open($save_path, $name)
     {
         return true;
     }
 
     //close the connection to the session storage
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
     //read the session data for this session
+    /**
+     * {@inheritdoc}
+     */
     public function read($sid)
     {
         $select_statement = $this->db->prepare("SELECT data FROM sessions WHERE sid=?");
@@ -36,6 +45,9 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
     }
 
     //write the session data to the session storage
+    /**
+     * {@inheritdoc}
+     */
     public function write($sid, $data)
     {
         $update_statement = $this->db->prepare("UPDATE sessions SET data=?, timestamp=UNIX_TIMESTAMP() WHERE sid=?");
@@ -53,6 +65,9 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
     }
 
     //destroy the session data from the session storage
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sid)
     {
         $delete_statement = $this->db->prepare("DELETE FROM sessions WHERE sid=?");
@@ -62,6 +77,9 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
     }
 
     //Garbage collection of expired sessions from the session storage
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxLifeTime)
     {
         $timestamp = time() - $maxLifeTime;
@@ -73,6 +91,9 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
 
     //Generate a new Session ID
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return bin2hex(random_bytes(32));

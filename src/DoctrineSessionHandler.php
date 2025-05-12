@@ -17,6 +17,9 @@ class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandle
         $this->connection = $connection;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         return (string) $this->connection->fetchColumn(
@@ -27,6 +30,9 @@ class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandle
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $sessionData): bool
     {
         $sql = 'INSERT INTO sessions (session_id, session_data, session_time) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE session_data = VALUES(session_data), session_time = VALUES(session_time)';
@@ -37,28 +43,43 @@ class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandle
         $stmt->execute();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         $this->connection->executeQuery('DELETE FROM sessions WHERE session_id = ?', [$sessionId]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxLifetime)
     {
         $this->connection->executeQuery('DELETE FROM sessions WHERE session_time < ?', [time() - $maxLifetime]);
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return md5(uniqid(mt_rand(), true));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         $stmt = $this->connection->executeQuery('SELECT session_time FROM sessions WHERE session_id = ?', [$sessionId]);
         return $stmt->fetchColumn() !== false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $sessionData)
     {
         $sql = 'UPDATE sessions SET session_time = ? WHERE session_id = ?';

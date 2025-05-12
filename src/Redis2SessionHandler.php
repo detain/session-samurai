@@ -27,6 +27,9 @@ class Redis2SessionHandler implements \SessionHandlerInterface, \SessionIdInterf
     }
 
     // Closes the session
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         if (!$this->isChanged) {
@@ -40,12 +43,18 @@ class Redis2SessionHandler implements \SessionHandlerInterface, \SessionIdInterf
     }
 
     // Destroys n active session
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         $this->redis->del($sessionId);
     }
 
     // Cleanup old session
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxlifetime)
     {
         $interval = $maxlifetime * 1000;
@@ -59,6 +68,9 @@ class Redis2SessionHandler implements \SessionHandlerInterface, \SessionIdInterf
     }
 
     // Reads data from active session
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $this->sessionId = $sessionId;
@@ -67,6 +79,9 @@ class Redis2SessionHandler implements \SessionHandlerInterface, \SessionIdInterf
     }
 
     // Writes data to the active session
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $data): bool
     {
         $this->isChanged = true;
@@ -77,6 +92,9 @@ class Redis2SessionHandler implements \SessionHandlerInterface, \SessionIdInterf
     }
 
     // Updates the timestamp of the active session
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $data)
     {
         $this->sessionId = $sessionId;

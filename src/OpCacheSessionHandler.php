@@ -12,16 +12,25 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         opcache_reset();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $cached = opcache_get($sessionId);
@@ -31,6 +40,9 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return $cached['payload'];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $sessionData): bool
     {
         opcache_compile_file(__FILE__);
@@ -38,30 +50,45 @@ class OpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInter
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         opcache_delete($sessionId);
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxLifetime)
     {
         return true;
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         $this->sessionId = bin2hex(random_bytes(32));
         return $this->sessionId;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         $cached = opcache_get($sessionId);
         return $cached !== false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $sessionData)
     {
         $cached = opcache_get($sessionId);

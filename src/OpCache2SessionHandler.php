@@ -11,6 +11,9 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         $this->savePath = $savePath;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         if (!$this->savePath) {
@@ -19,11 +22,17 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $file = $this->savePath . '/sess_' . $sessionId;
@@ -34,6 +43,9 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         return (string) $data;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $data): bool
     {
         $file = $this->savePath . '/sess_' . $sessionId;
@@ -41,6 +53,9 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         return file_put_contents($file, $data) === false ? false : true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         $file = $this->savePath . '/sess_' . $sessionId;
@@ -50,6 +65,9 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($lifetime)
     {
         foreach (glob($this->savePath . '/sess_*') as $file) {
@@ -61,16 +79,25 @@ class OpCache2SessionHandler implements SessionHandlerInterface, SessionIdInterf
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return md5(uniqid());
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         return (bool) preg_match('/^[a-zA-Z0-9]{32}$/', $sessionId);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $data)
     {
         $file = $this->savePath . '/sess_' . $sessionId;

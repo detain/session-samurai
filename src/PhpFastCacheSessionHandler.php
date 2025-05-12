@@ -23,22 +23,34 @@ class PhpFastCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         $this->cache = CacheManager::getInstance('files', $cacheConfig);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function close(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($sessionId)
     {
         $item = $this->cache->getItem($sessionId);
         return $item->get();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($sessionId, $data): bool
     {
         $item = $this->cache->getItem($sessionId);
@@ -47,22 +59,34 @@ class PhpFastCacheSessionHandler implements \SessionHandlerInterface, \SessionId
         $this->cache->save($item);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function destroy($sessionId): bool
     {
         $this->cache->deleteItem($sessionId);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function gc($maxlifetime)
     {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         $item = $this->cache->getItem($sessionId);
         return $item->get();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateTimestamp($sessionId, $data)
     {
         $item = $this->cache->getItem($sessionId);
@@ -71,6 +95,9 @@ class PhpFastCacheSessionHandler implements \SessionHandlerInterface, \SessionId
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    /**
+     * {@inheritdoc}
+     */
     public function create_sid()
     {
         return bin2hex(random_bytes(32));
