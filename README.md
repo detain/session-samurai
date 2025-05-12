@@ -23,12 +23,23 @@ composer requre detain/session-samurai
 
 ## Usage
 
+### Using Memcached
+
 ```php
 require 'vendor/autoload.php';  // set up autoloading using composer
 
 $memcached = new \Memcached();  // create connection to memcached
 $memcached->addServer('localhost', 11211);
 $handler = new \Detain\SessionSamurai\MemcachedSessionHandler($memcached);
+session_set_save_handler($handler, true);
+```
+
+### Using Redis
+
+```php
+$redis = new \Redis();
+$redis->connect('127.0.0.1', 6379);
+$handler = new \Detain\SessionSamurai\RedisSessionHandler($redis);
 session_set_save_handler($handler, true);
 ```
 
