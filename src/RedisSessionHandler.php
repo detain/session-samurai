@@ -81,7 +81,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function gc($maxlifetime): bool
+    public function gc($maxlifetime)
     {
         return true;
     }
