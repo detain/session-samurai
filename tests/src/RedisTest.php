@@ -12,7 +12,7 @@ class RedisTest extends TestCase
 
     public function setUp(): void
     {
-        $this->redis = new Redis();
+        $this->redis = new \Redis();
         $this->assertTrue($this->redis->connect('127.0.0.1', 6379));
     }
 
