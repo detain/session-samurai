@@ -6,9 +6,9 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
 {
     protected $db;
 
-    public function __construct(mysqli $db)
+    public function __construct(\mysqli &$db)
     {
-        $this->db = $db;
+        $this->db = &$db;
     }
 
     //open a connection to the session storage
