@@ -41,6 +41,7 @@ class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandle
         $stmt->bindValue(2, $sessionData);
         $stmt->bindValue(3, time());
         $stmt->execute();
+        return true;
     }
 
     /**
@@ -49,6 +50,7 @@ class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandle
     public function destroy($sessionId): bool
     {
         $this->connection->executeQuery('DELETE FROM sessions WHERE session_id = ?', [$sessionId]);
+        return true;
     }
 
     /**
@@ -57,15 +59,16 @@ class DoctrineSessionHandler extends PdoSessionHandler implements \SessionHandle
     public function gc($maxLifetime)
     {
         $this->connection->executeQuery('DELETE FROM sessions WHERE session_time < ?', [time() - $maxLifetime]);
+        return true;
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     /**
      * {@inheritdoc}
      */
-    public function create_sid()
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid(): string
     {
-        return md5(uniqid(mt_rand(), true));
+        return bin2hex(random_bytes(32));
     }
 
     /**

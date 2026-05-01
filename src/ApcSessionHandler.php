@@ -4,10 +4,10 @@ namespace Detain\SessionSamurai;
 
 class ApcSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private $lifetime;
-    private $prefix;
+    private int $lifetime;
+    private string $prefix;
 
-    public function __construct($lifetime = 0, $prefix = 'apc_sess_')
+    public function __construct(int $lifetime = 0, string $prefix = 'apc_sess_')
     {
         $this->lifetime = $lifetime;
         $this->prefix = $prefix;
@@ -16,7 +16,7 @@ class ApcSessionHandler implements \SessionHandlerInterface, \SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function open($save_path, $session_name): bool
+    public function open(string $save_path, string $session_name): bool
     {
         return true;
     }
@@ -32,58 +32,60 @@ class ApcSessionHandler implements \SessionHandlerInterface, \SessionIdInterface
     /**
      * {@inheritdoc}
      */
-    public function read($session_id)
+    public function read(string $session_id): string
     {
-        return \apc_fetch($this->prefix . $session_id);
+        $value = \apc_fetch($this->prefix . $session_id);
+        return is_string($value) ? $value : '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($session_id, $session_data): bool
+    public function write(string $session_id, string $session_data): bool
     {
-        return \apc_store($this->prefix . $session_id, $session_data, $this->lifetime);
+        return (bool) \apc_store($this->prefix . $session_id, $session_data, $this->lifetime);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function destroy($session_id): bool
+    public function destroy(string $session_id): bool
     {
-        return \apc_delete($this->prefix . $session_id);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function gc($maxlifetime)
-    {
+        \apc_delete($this->prefix . $session_id);
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function gc(int $maxlifetime): int|false
+    {
+        return 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    /**
-     * {@inheritdoc}
-     */
-    public function create_sid()
+    public function create_sid(): string
     {
-        $sid = session_create_id();
-        return $this->prefix . $sid;
+        return bin2hex(random_bytes(32));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validateId($session_id)
+    public function validateId(string $session_id): bool
     {
-        return true;
+        return (bool) preg_match('/^[0-9a-f]{64}$/', $session_id);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateTimestamp($session_id, $session_data)
+    public function updateTimestamp(string $session_id, string $session_data): bool
     {
+        \apc_store($this->prefix . $session_id, $session_data, $this->lifetime);
         return true;
     }
 }

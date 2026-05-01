@@ -2,26 +2,23 @@
 
 namespace Detain\SessionSamurai;
 
-use League\Flysystem\FilesystemInterface;
-use SessionHandlerInterface;
-use SessionIdInterface;
-use SessionUpdateTimestampHandlerInterface;
+use League\Flysystem\FilesystemOperator;
 
 class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    protected $filesystem;
-    protected $path;
+    protected FilesystemOperator $filesystem;
+    protected string $path;
 
-    public function __construct(FilesystemInterface $filesystem, $path = '/')
+    public function __construct(FilesystemOperator $filesystem, string $path = '/')
     {
         $this->filesystem = $filesystem;
-        $this->path = $path;
+        $this->path = rtrim($path, '/');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function open($save_path, $name)
+    public function open(string $save_path, string $name): bool
     {
         return true;
     }
@@ -37,33 +34,36 @@ class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     /**
      * {@inheritdoc}
      */
-    public function read($session_id)
+    public function read(string $session_id): string
     {
         $session_path = $this->getSessionPath($session_id);
-        if (!$this->filesystem->has($session_path)) {
+        try {
+            return $this->filesystem->read($session_path);
+        } catch (\Throwable $e) {
             return '';
         }
-        return $this->filesystem->read($session_path);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($session_id, $session_data): bool
+    public function write(string $session_id, string $session_data): bool
     {
         $session_path = $this->getSessionPath($session_id);
-        $this->filesystem->put($session_path, $session_data);
+        $this->filesystem->write($session_path, $session_data);
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function destroy($session_id): bool
+    public function destroy(string $session_id): bool
     {
         $session_path = $this->getSessionPath($session_id);
-        if ($this->filesystem->has($session_path)) {
+        try {
             $this->filesystem->delete($session_path);
+        } catch (\Throwable $e) {
+            // file may not exist
         }
         return true;
     }
@@ -71,48 +71,53 @@ class FlySystemSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     /**
      * {@inheritdoc}
      */
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
         $expired_time = time() - $maxlifetime;
-        $expired_sessions = $this->filesystem->listContents($this->path, true);
-        foreach ($expired_sessions as $session) {
-            if ($session['timestamp'] < $expired_time) {
-                $this->filesystem->delete($session['path']);
+        $count = 0;
+        foreach ($this->filesystem->listContents($this->path) as $item) {
+            if ($item->lastModified() < $expired_time) {
+                $this->filesystem->delete($item->path());
+                $count++;
             }
         }
-        return true;
+        return $count;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    /**
-     * {@inheritdoc}
-     */
-    public function create_sid()
+    public function create_sid(): string
     {
-        return md5(uniqid());
+        return bin2hex(random_bytes(32));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validateId($session_id)
+    public function validateId(string $session_id): bool
     {
         $session_path = $this->getSessionPath($session_id);
-        return $this->filesystem->has($session_path);
+        return $this->filesystem->fileExists($session_path);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateTimestamp($session_id, $session_data)
+    public function updateTimestamp(string $session_id, string $session_data): bool
     {
         $session_path = $this->getSessionPath($session_id);
-        $timestamp = time();
-        $this->filesystem->updateTimestamp($session_path, $timestamp);
-        return true;
+        try {
+            $existing = $this->filesystem->read($session_path);
+            $this->filesystem->write($session_path, $existing);
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
-    protected function getSessionPath($session_id)
+    protected function getSessionPath(string $session_id): string
     {
         return $this->path . '/' . $session_id;
     }

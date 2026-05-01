@@ -26,15 +26,9 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     private string $keyPrefix;
 
     /**
-     * RedisSessionHandler constructor.
-     *
-     * @param Redis|null $redis     An existing Redis connection (optional).
-     * @param string     $host      Redis host (used if no $redis provided).
-     * @param int        $port      Redis port.
-     * @param int|null   $ttl  Session ttl in seconds (defaults to ini setting).
-     * @param string     $keyPrefix Key prefix to isolate sessions.
-     *
-     * @throws RuntimeException If unable to connect to Redis.
+     * @param Redis  $redis     An existing Redis connection.
+     * @param int    $ttl       Session TTL in seconds.
+     * @param string $keyPrefix Key prefix to isolate sessions.
      */
     public function __construct(Redis &$redis, int $ttl = 86400, string $keyPrefix = 'PHPREDIS_SESSION:') {
         $this->redis = &$redis;
@@ -65,7 +59,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     public function read(string $sessionId): string
     {
         $data = $this->redis->get($this->keyPrefix . $sessionId);
-        return $data === false ? '' : $data;
+        return is_string($data) ? $data : '';
     }
 
     /**
@@ -99,6 +93,7 @@ class RedisSessionHandler implements SessionHandlerInterface, SessionIdInterface
     /**
      * {@inheritdoc}
      */
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid(): string
     {
         // Generate a 32‐byte random ID, hex‐encoded, for 64 chars.

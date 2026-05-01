@@ -90,8 +90,8 @@ class MySessionHandlerTest extends \PHPUnit\Framework\TestCase
         sleep(2);
         // update the timestamp on session1
         $this->assertTrue($this->handler->updateTimestamp($sessionId1, 'test'));
-        // Ensure the gc() method returns true
-        $this->assertTrue($this->handler->gc(0));
+        // Ensure the gc() method returns a non-false value
+        $this->assertNotFalse($this->handler->gc(0));
         // ensure the one session is valid and the other invalid
         $this->assertTrue($this->handler->validateId($sessionId1));
         $this->assertFalse($this->handler->validateId($sessionId2));

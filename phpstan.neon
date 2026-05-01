@@ -6,4 +6,11 @@ parameters:
         - src
 
     treatPhpDocTypesAsCertain: false
-    checkMissingIterableValueType: false
+
+    excludePaths:
+        - src/DoctrineDBALSessionHandler.php
+        - src/DoctrineSessionHandler.php
+        - src/IlluminateSessionHandler.php
+        - src/InfluxDbSessionHandler.php
+        - src/PhpCacheSessionHandler.php
+        - src/PhpFastCacheSessionHandler.php

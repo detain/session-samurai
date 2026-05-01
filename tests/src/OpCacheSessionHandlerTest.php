@@ -50,7 +50,7 @@ class OpCacheSessionHandlerTest extends TestCase
 
     public function testGc()
     {
-        $this->assertTrue($this->handler->gc(100));
+        $this->assertNotFalse($this->handler->gc(100));
     }
 
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
@@ -62,11 +62,18 @@ class OpCacheSessionHandlerTest extends TestCase
 
     public function testValidateId()
     {
-        $this->assertTrue($this->handler->validateId('test'));
+        $sid = $this->handler->create_sid();
+        $this->handler->write($sid, 'data');
+        $this->assertTrue($this->handler->validateId($sid));
+        $this->assertFalse($this->handler->validateId('nonexistentsession'));
+        $this->handler->destroy($sid);
     }
 
     public function testUpdateTimestamp()
     {
-        $this->assertTrue($this->handler->updateTimestamp('test', 100));
+        $sid = $this->handler->create_sid();
+        $this->handler->write($sid, 'data');
+        $this->assertTrue($this->handler->updateTimestamp($sid, 'data'));
+        $this->handler->destroy($sid);
     }
 }

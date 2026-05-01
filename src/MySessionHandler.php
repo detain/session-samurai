@@ -4,7 +4,7 @@ namespace Detain\SessionSamurai;
 
 class MySessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private $savePath;
+    private string $savePath = '';
 
     /**
      * {@inheritdoc}
@@ -26,11 +26,12 @@ class MySessionHandler implements \SessionHandlerInterface, \SessionIdInterface,
     /**
      * {@inheritdoc}
      */
-    public function read($sessionId)
+    public function read(string $sessionId): string
     {
         $sessionFile = $this->savePath . '/sess_' . $sessionId;
         if (file_exists($sessionFile)) {
-            return file_get_contents($sessionFile);
+            $data = file_get_contents($sessionFile);
+            return $data !== false ? $data : '';
         }
         return '';
     }
@@ -59,29 +60,31 @@ class MySessionHandler implements \SessionHandlerInterface, \SessionIdInterface,
     /**
      * {@inheritdoc}
      */
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
-        foreach (glob($this->savePath . '/sess_*') as $file) {
+        $count = 0;
+        foreach (glob($this->savePath . '/sess_*') ?: [] as $file) {
             if (filemtime($file) + $maxlifetime < time() && file_exists($file)) {
                 unlink($file);
+                $count++;
             }
         }
-        return true;
+        return $count;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    /**
-     * {@inheritdoc}
-     */
-    public function create_sid()
+    public function create_sid(): string
     {
-        return md5(uniqid());
+        return bin2hex(random_bytes(32));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validateId($sessionId)
+    public function validateId(string $sessionId): bool
     {
         $sessionFile = $this->savePath . '/sess_' . $sessionId;
         return file_exists($sessionFile);
@@ -90,7 +93,7 @@ class MySessionHandler implements \SessionHandlerInterface, \SessionIdInterface,
     /**
      * {@inheritdoc}
      */
-    public function updateTimestamp($sessionId, $sessionData)
+    public function updateTimestamp(string $sessionId, string $sessionData): bool
     {
         $sessionFile = $this->savePath . '/sess_' . $sessionId;
         return touch($sessionFile);

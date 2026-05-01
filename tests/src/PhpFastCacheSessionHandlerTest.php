@@ -4,28 +4,25 @@ namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
 use Detain\SessionSamurai\PhpFastCacheSessionHandler;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\CacheItemInterface;
 
 class PhpFastCacheSessionHandlerTest extends TestCase
 {
-    protected $handler;
-    protected $sessionId;
+    private PhpFastCacheSessionHandler $handler;
+    private CacheItemPoolInterface $cache;
+    private string $sessionId;
 
     public function setUp(): void
     {
-        $this->handler = new PhpFastCacheSessionHandler();
-        $this->sessionId = uniqid();
-    }
-
-    public function tearDown(): void
-    {
-        $this->handler = null;
-        $this->sessionId = null;
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
+        $this->handler = new PhpFastCacheSessionHandler($this->cache);
+        $this->sessionId = $this->handler->create_sid();
     }
 
     public function testOpen()
     {
         $this->assertTrue($this->handler->open('', ''));
-        $this->handler->close();
     }
 
     public function testClose()
@@ -33,43 +30,65 @@ class PhpFastCacheSessionHandlerTest extends TestCase
         $this->assertTrue($this->handler->close());
     }
 
-    public function testRead()
+    public function testReadMiss()
     {
-        $this->handler->write($this->sessionId, 'foo');
-        $this->assertEquals('foo', $this->handler->read($this->sessionId));
-        $this->handler->destroy($this->sessionId);
+        $item = $this->createMock(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(false);
+        $this->cache->method('getItem')->willReturn($item);
+        $this->assertSame('', $this->handler->read($this->sessionId));
+    }
+
+    public function testReadHit()
+    {
+        $item = $this->createMock(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(true);
+        $item->method('get')->willReturn('foo');
+        $this->cache->method('getItem')->willReturn($item);
+        $this->assertSame('foo', $this->handler->read($this->sessionId));
     }
 
     public function testWrite()
     {
+        $item = $this->createMock(CacheItemInterface::class);
+        $item->method('set')->willReturn($item);
+        $item->method('expiresAfter')->willReturn($item);
+        $this->cache->method('getItem')->willReturn($item);
+        $this->cache->method('save')->willReturn(true);
         $this->assertTrue($this->handler->write($this->sessionId, 'foo'));
-        $this->handler->destroy($this->sessionId);
     }
 
     public function testDestroy()
     {
-        $this->handler->write($this->sessionId, 'foo');
+        $this->cache->method('deleteItem')->willReturn(true);
         $this->assertTrue($this->handler->destroy($this->sessionId));
     }
 
     public function testGc()
     {
-        $this->assertTrue($this->handler->gc(0));
+        $this->assertNotFalse($this->handler->gc(0));
     }
 
-    public function testCreateSid()
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function testCreate_sid()
     {
         $sid = $this->handler->create_sid();
-        $this->assertIsString($sid);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $sid);
     }
 
-    public function testValidateId($key)
+    public function testValidateId()
     {
+        $item = $this->createMock(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(true);
+        $this->cache->method('getItem')->willReturn($item);
         $this->assertTrue($this->handler->validateId($this->sessionId));
     }
 
     public function testUpdateTimestamp()
     {
+        $item = $this->createMock(CacheItemInterface::class);
+        $item->method('expiresAfter')->willReturn($item);
+        $this->cache->method('getItem')->willReturn($item);
+        $this->cache->method('save')->willReturn(true);
         $this->assertTrue($this->handler->updateTimestamp($this->sessionId, 'foo'));
     }
 }

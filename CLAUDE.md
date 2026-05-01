@@ -49,7 +49,7 @@ class MyBackendSessionHandler implements
 - **Databases**: `MysqliSessionHandler`, `PDOSessionHandler`, `SQLite3SessionHandler`, `DoctrineDBALSessionHandler`, `DoctrineSessionHandler`
 - **Document / time-series**: `MongoDbSessionHandler`, `InfluxDbSessionHandler`
 - **Cache abstractions**: `SymfonyCacheSessionHandler` (Symfony `AdapterInterface`), `PhpFastCacheSessionHandler` (`CacheManager`), `PhpCacheSessionHandler`
-- **Filesystem**: `FileSessionHandler`, `FlySystemSessionHandler` (`FilesystemInterface`)
+- **Filesystem**: `FileSessionHandler`, `FlySystemSessionHandler` (`FilesystemOperator`)
 - **IPC**: `SemaphoreSessionHandler` (POSIX `sem_get`/`shm_attach`)
 - **Framework**: `IlluminateSessionHandler` (Laravel `SessionManager`)
 
@@ -147,3 +147,12 @@ This project uses [Caliber](https://github.com/caliber-ai-org/ai-setup) to keep 
 Configs update automatically before each commit via `caliber refresh`.
 If the pre-commit hook is not set up, run `/setup-caliber` to configure everything automatically.
 <!-- /caliber:managed:sync -->
+
+<!-- caliber:managed:model-config -->
+## Model Configuration
+
+Recommended default: `claude-sonnet-4-6` with high effort (stronger reasoning; higher cost and latency than smaller models).
+Smaller/faster models trade quality for speed and cost — pick what fits the task.
+Pin your choice (`/model` in Claude Code, or `CALIBER_MODEL` when using Caliber with an API provider) so upstream default changes do not silently change behavior.
+
+<!-- /caliber:managed:model-config -->

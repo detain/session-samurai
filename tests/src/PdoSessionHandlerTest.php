@@ -7,70 +7,71 @@ use Detain\SessionSamurai\PDOSessionHandler;
 
 class PdoSessionHandlerTest extends TestCase
 {
-    /**
-     * @var PdoSessionHandler
-     */
-    private $pdoSessionHandler;
+    private PDOSessionHandler $handler;
+    private \PDO $pdo;
 
-    /**
-     * @before
-     */
-    public function setupTestClass()
+    public function setUp(): void
     {
-        $this->pdoSessionHandler = new PdoSessionHandler();
+        $this->pdo = new \PDO('sqlite::memory:');
+        $this->pdo->exec('CREATE TABLE sessions (id TEXT PRIMARY KEY, data TEXT, updated_at INTEGER)');
+        $this->handler = new PDOSessionHandler($this->pdo);
     }
 
     public function testOpen()
     {
-        $this->assertTrue($this->pdoSessionHandler->open());
+        $this->assertTrue($this->handler->open('', 'PHPSESSID'));
     }
 
     public function testClose()
     {
-        $this->assertTrue($this->pdoSessionHandler->close());
+        $this->assertTrue($this->handler->close());
     }
 
-    public function testRead()
+    public function testReadEmpty()
     {
-        $data = 'my test data';
-        $key =  uniqid();
-        $this->pdoSessionHandler->write($key, $data);
-
-        $resultData = $this->pdoSessionHandler->read($key);
-        $this->assertEquals($data, $resultData);
+        $this->assertSame('', $this->handler->read('nonexistent'));
     }
 
     public function testWrite()
     {
+        $key = $this->handler->create_sid();
+        $this->assertTrue($this->handler->write($key, 'my test data'));
+    }
+
+    public function testWriteRead()
+    {
         $data = 'my test data';
-        $key =  uniqid();
-        $this->assertTrue($this->pdoSessionHandler->write($key, $data));
+        $key = $this->handler->create_sid();
+        $this->handler->write($key, $data);
+        $this->assertSame($data, $this->handler->read($key));
     }
 
     public function testDestroy()
     {
-        $data = 'my test data';
-        $key =  uniqid();
-        $this->pdoSessionHandler->write($key, $data);
-
-        $this->assertTrue($this->pdoSessionHandler->destroy($key));
+        $key = $this->handler->create_sid();
+        $this->handler->write($key, 'data');
+        $this->assertTrue($this->handler->destroy($key));
+        $this->assertSame('', $this->handler->read($key));
     }
 
-    public function testGarbageCollection()
+    public function testGc()
     {
-        $data = 'my test data';
-        $key =  uniqid();
-        $this->pdoSessionHandler->write($key, $data);
-
-        $this->assertTrue($this->pdoSessionHandler->gc(0));
+        $key = $this->handler->create_sid();
+        $this->handler->write($key, 'data');
+        $this->assertNotFalse($this->handler->gc(0));
     }
 
     public function testUpdateTimestamp()
     {
-        $data = 'my test data';
-        $key =  uniqid();
-        $this->pdoSessionHandler->write($key, $data);
+        $key = $this->handler->create_sid();
+        $this->handler->write($key, 'data');
+        $this->assertTrue($this->handler->updateTimestamp($key, 'data'));
+    }
 
-        $this->assertTrue($this->pdoSessionHandler->updateTimestamp($key, '1234567890'));
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function testCreate_sid()
+    {
+        $sid = $this->handler->create_sid();
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $sid);
     }
 }

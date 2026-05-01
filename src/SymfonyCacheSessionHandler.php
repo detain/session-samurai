@@ -2,19 +2,15 @@
 
 namespace Detain\SessionSamurai;
 
-use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\HttpFoundation\Session\SessionUpdateTimestampHandlerInterface;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler;
+use Psr\Cache\CacheItemPoolInterface;
 
 class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private $cache;
-    private $ttl;
-    private $prefix;
+    private CacheItemPoolInterface $cache;
+    private int $ttl;
+    private string $prefix;
 
-    public function __construct(AdapterInterface $cache, $ttl = 0, $prefix = 'session.')
+    public function __construct(CacheItemPoolInterface $cache, int $ttl = 0, string $prefix = 'session.')
     {
         $this->cache = $cache;
         $this->ttl = $ttl;
@@ -24,7 +20,7 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
     /**
      * {@inheritdoc}
      */
-    public function open($savePath, $sessionName): bool
+    public function open(string $savePath, string $sessionName): bool
     {
         return true;
     }
@@ -40,7 +36,7 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
     /**
      * {@inheritdoc}
      */
-    public function read($sessionId)
+    public function read(string $sessionId): string
     {
         $key = $this->prefix . $sessionId;
         $data = $this->cache->getItem($key);
@@ -49,13 +45,14 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
             return '';
         }
 
-        return $data->get();
+        $value = $data->get();
+        return is_string($value) ? $value : '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($sessionId, $data): bool
+    public function write(string $sessionId, string $data): bool
     {
         $key = $this->prefix . $sessionId;
         $item = $this->cache->getItem($key);
@@ -71,7 +68,7 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
     /**
      * {@inheritdoc}
      */
-    public function destroy($sessionId): bool
+    public function destroy(string $sessionId): bool
     {
         $key = $this->prefix . $sessionId;
 
@@ -81,32 +78,33 @@ class SymfonyCacheSessionHandler implements \SessionHandlerInterface, \SessionId
     /**
      * {@inheritdoc}
      */
-    public function gc($maxLifetime)
+    public function gc(int $maxLifetime): int|false
     {
-        return true;
+        return 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validateId($id)
+    public function validateId(string $id): bool
     {
-        return $this->cache->getItem($id);
+        $key = $this->prefix . $id;
+        return $this->cache->getItem($key)->isHit();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    /**
-     * {@inheritdoc}
-     */
-    public function create_sid()
+    public function create_sid(): string
     {
-        return md5(uniqid('', true));
+        return bin2hex(random_bytes(32));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateTimestamp($sessionId, $data)
+    public function updateTimestamp(string $sessionId, string $data): bool
     {
         return $this->write($sessionId, $data);
     }

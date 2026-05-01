@@ -2,94 +2,106 @@
 
 namespace Detain\SessionSamuraiTest;
 
-use Detain\SessionSamurai\MysqliiSessionHandler;
+use PHPUnit\Framework\TestCase;
+use Detain\SessionSamurai\MysqliSessionHandler;
 
-class MysqliSessionHandlerTest extends \PHPUnit\Framework\TestCase
+class MysqliSessionHandlerTest extends TestCase
 {
     public function testSessionIdInterface()
     {
-        $mockHandler = $this->getMockBuilder('MysqlSessionHandler')
-        ->setMethods(["create_sid", "validateId"])
-        ->getMock();
+        $mockHandler = $this->getMockBuilder(MysqliSessionHandler::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['create_sid', 'validateId'])
+            ->getMock();
 
         $mockHandler->expects($this->once())
-        ->method("create_sid")
-        ->willReturn("96d2dd71a38d185f9c9ad3e3a41b605e");
+            ->method('create_sid')
+            ->willReturn('96d2dd71a38d185f9c9ad3e3a41b605e');
 
         $this->assertEquals(
-            "96d2dd71a38d185f9c9ad3e3a41b605e",
+            '96d2dd71a38d185f9c9ad3e3a41b605e',
             $mockHandler->create_sid()
         );
 
         $mockHandler->expects($this->once())
-        ->method("validateId")
-        ->with("96d2dd71a38d185f9c9ad3e3a41b605e")
-        ->willReturn(true);
+            ->method('validateId')
+            ->with('96d2dd71a38d185f9c9ad3e3a41b605e')
+            ->willReturn(true);
 
-        $this->assertTrue($mockHandler->validateId("96d2dd71a38d185f9c9ad3e3a41b605e"));
+        $this->assertTrue($mockHandler->validateId('96d2dd71a38d185f9c9ad3e3a41b605e'));
     }
 
     public function testSessionHandlerInterface()
     {
-        $mockHandler = $this->getMockBuilder('MysqlSessionHandler')
-        ->setMethods(["open", "close", "read", "write", "destroy", "gc"])
-        ->getMock();
+        $mockHandler = $this->getMockBuilder(MysqliSessionHandler::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['open', 'close', 'read', 'write', 'destroy', 'gc'])
+            ->getMock();
 
         $mockHandler->expects($this->once())
-        ->method("open")
-        ->with("/path/to/sessions", "session_name")
-        ->willReturn(true);
+            ->method('open')
+            ->with('/path/to/sessions', 'session_name')
+            ->willReturn(true);
 
-        $this->assertTrue($mockHandler->open("/path/to/sessions", "session_name"));
+        $this->assertTrue($mockHandler->open('/path/to/sessions', 'session_name'));
 
         $mockHandler->expects($this->once())
-        ->method("close")
-        ->willReturn(true);
+            ->method('close')
+            ->willReturn(true);
 
         $this->assertTrue($mockHandler->close());
 
-        $sessionData = "data1;data2;data3";
+        $sessionData = 'data1;data2;data3';
 
         $mockHandler->expects($this->once())
-        ->method("read")
-        ->with("session_id")
-        ->willReturn($sessionData);
+            ->method('read')
+            ->with('session_id')
+            ->willReturn($sessionData);
 
-        $this->assertEquals($sessionData, $mockHandler->read("session_id"));
-
-        $mockHandler->expects($this->once())
-        ->method("write")
-        ->with("session_id", $sessionData)
-        ->willReturn(true);
-
-        $this->assertTrue($mockHandler->write("session_id", $sessionData));
+        $this->assertEquals($sessionData, $mockHandler->read('session_id'));
 
         $mockHandler->expects($this->once())
-        ->method("destroy")
-        ->with("session_id")
-        ->willReturn(true);
+            ->method('write')
+            ->with('session_id', $sessionData)
+            ->willReturn(true);
 
-        $this->assertTrue($mockHandler->destroy("session_id"));
+        $this->assertTrue($mockHandler->write('session_id', $sessionData));
 
         $mockHandler->expects($this->once())
-        ->method("gc")
-        ->with(1000)
-        ->willReturn(true);
+            ->method('destroy')
+            ->with('session_id')
+            ->willReturn(true);
 
-        $this->assertTrue($mockHandler->gc(1000));
+        $this->assertTrue($mockHandler->destroy('session_id'));
+
+        $mockHandler->expects($this->once())
+            ->method('gc')
+            ->with(1000)
+            ->willReturn(1);
+
+        $this->assertNotFalse($mockHandler->gc(1000));
     }
 
     public function testSessionUpdateTimestampHandlerInterface()
     {
-        $mockHandler = $this->getMockBuilder('MysqlSessionHandler')
-        ->setMethods(["updateTimestamp"])
-        ->getMock();
+        $mockHandler = $this->getMockBuilder(MysqliSessionHandler::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['updateTimestamp'])
+            ->getMock();
 
         $mockHandler->expects($this->once())
-        ->method("updateTimestamp")
-        ->with("session_id", "time")
-        ->willReturn(true);
+            ->method('updateTimestamp')
+            ->with('session_id', 'time')
+            ->willReturn(true);
 
-        $this->assertTrue($mockHandler->updateTimestamp("session_id", "time"));
+        $this->assertTrue($mockHandler->updateTimestamp('session_id', 'time'));
+    }
+
+    public function testCreateSidIsSecure()
+    {
+        $mockDb = $this->createMock(\mysqli::class);
+        $handler = new MysqliSessionHandler($mockDb);
+        $sid = $handler->create_sid();
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $sid);
     }
 }

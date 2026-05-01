@@ -47,6 +47,7 @@ class IlluminateSessionHandler implements \SessionHandlerInterface, \SessionIdIn
     public function write($sessionId, $data): bool
     {
         $this->handler->write($sessionId, $data);
+        return true;
     }
 
     /**
@@ -55,6 +56,7 @@ class IlluminateSessionHandler implements \SessionHandlerInterface, \SessionIdIn
     public function destroy($sessionId): bool
     {
         $this->handler->destroy($sessionId);
+        return true;
     }
 
     /**
@@ -63,12 +65,13 @@ class IlluminateSessionHandler implements \SessionHandlerInterface, \SessionIdIn
     public function gc($maxLifetime)
     {
         $this->handler->gc($maxLifetime);
+        return true;
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     /**
      * {@inheritdoc}
      */
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid()
     {
         return $this->manager->driver()->generateSessionId();

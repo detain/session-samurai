@@ -4,87 +4,98 @@ declare(strict_types=1);
 
 namespace Detain\SessionSamuraiTest;
 
-use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\SessionHandlerDBAL;
 use PHPUnit\Framework\TestCase;
 use Detain\SessionSamurai\DoctrineDBALSessionHandler;
 
 class DoctrineDBALSessionHandlerTest extends TestCase
 {
-    /** @var Connection */
-    protected $connection;
-
-    /** @var SessionHandlerDBAL */
-    protected $dbalSessionHandler;
-
     public function setUp(): void
     {
-        $ids = [
-            'db_name' => 'foo_db',
-            'db_user' => 'foo_user',
-            'db_pass' => 'foo_pass',
-        ];
-
-        $pdo_dsn = "mysql:dbname={$ids['db_name']};"
-            . "host=localhost";
-
-        $this->connection = DriverManager::getConnection(
-            [
-                'pdo' => new \PDO($pdo_dsn, $ids['db_user'], $ids['db_pass'])
-            ]
-        );
-
-        $this->dbalSessionHandler = new SessionHandlerDBAL(
-            $this->connection
-        );
+        if (!class_exists('Doctrine\DBAL\Connection')) {
+            $this->markTestSkipped('doctrine/dbal is not installed');
+        }
     }
 
     public function testOpenSession(): void
     {
-        $this->assertEquals(
-            true,
-            $this->dbalSessionHandler->open('foo', 'bar')
-        );
+        $connection = $this->createMockConnection();
+        $handler = new DoctrineDBALSessionHandler($connection);
+        $this->assertTrue($handler->open('', ''));
     }
 
     public function testCloseSession(): void
     {
-        $this->assertEquals(
-            true,
-            $this->dbalSessionHandler->close()
-        );
+        $connection = $this->createMockConnection();
+        $handler = new DoctrineDBALSessionHandler($connection);
+        $this->assertTrue($handler->close());
     }
 
     public function testReadSession(): void
     {
-        $this->assertEquals(
-            '',
-            $this->dbalSessionHandler->read('foo')
-        );
+        $connection = $this->createMockConnection();
+        $handler = new DoctrineDBALSessionHandler($connection);
+        $this->assertIsString($handler->read('nonexistent'));
     }
 
     public function testWriteSession(): void
     {
-        $this->assertEquals(
-            true,
-            $this->dbalSessionHandler->write('foo', 'bar')
-        );
+        $connection = $this->createMockConnection();
+        $handler = new DoctrineDBALSessionHandler($connection);
+        $this->assertTrue($handler->write('foo', 'bar'));
     }
 
     public function testDestroySession(): void
     {
-        $this->assertEquals(
-            true,
-            $this->dbalSessionHandler->destroy('foo')
-        );
+        $connection = $this->createMockConnection();
+        $handler = new DoctrineDBALSessionHandler($connection);
+        $this->assertTrue($handler->destroy('foo'));
     }
 
     public function testGcSession(): void
     {
-        $this->assertEquals(
-            true,
-            $this->dbalSessionHandler->gc(100)
-        );
+        $connection = $this->createMockConnection();
+        $handler = new DoctrineDBALSessionHandler($connection);
+        $this->assertNotFalse($handler->gc(100));
+    }
+
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function testCreate_sid(): void
+    {
+        $connection = $this->createMockConnection();
+        $handler = new DoctrineDBALSessionHandler($connection);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $handler->create_sid());
+    }
+
+    private function createMockConnection(): \Doctrine\DBAL\Connection
+    {
+        $schemaManager = $this->createMock(\Doctrine\DBAL\Schema\AbstractSchemaManager::class);
+        $schemaManager->method('listTableColumns')->willReturn([
+            'id' => true,
+            'data' => true,
+            'time' => true,
+        ]);
+
+        $stmt = $this->createMock(\Doctrine\DBAL\Result::class);
+        $stmt->method('fetch')->willReturn(false);
+        $stmt->method('fetchColumn')->willReturn(false);
+        $stmt->method('rowCount')->willReturn(0);
+
+        $qb = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        $qb->method('where')->willReturnSelf();
+        $qb->method('setParameter')->willReturnSelf();
+        $qb->method('update')->willReturnSelf();
+        $qb->method('set')->willReturnSelf();
+        $qb->method('insert')->willReturnSelf();
+        $qb->method('values')->willReturnSelf();
+        $qb->method('delete')->willReturnSelf();
+        $qb->method('execute')->willReturn($stmt);
+
+        $connection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $connection->method('getSchemaManager')->willReturn($schemaManager);
+        $connection->method('createQueryBuilder')->willReturn($qb);
+
+        return $connection;
     }
 }

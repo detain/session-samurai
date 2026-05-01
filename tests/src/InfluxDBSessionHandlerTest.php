@@ -3,70 +3,46 @@
 namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
-use Detain\SessionSamurai\InfluxDBSessionHandler;
+use Detain\SessionSamurai\InfluxDbSessionHandler;
 
 class InfluxDBSessionHandlerTest extends TestCase
 {
     public function setUp(): void
     {
-        // Create session handler instance
-        $this->handler = new InfluxDBSessionHandler();
+        if (!class_exists('InfluxDB\Client')) {
+            $this->markTestSkipped('influxdb/influxdb-php is not installed (v1 client required)');
+        }
     }
 
-    // Tests for open() method
-    public function testCanOpenSession()
+    public function testOpen()
     {
-        $result = $this->handler->open('null', 'test');
-
-        $this->assertTrue($result);
+        $client = $this->createMock(\InfluxDB\Client::class);
+        $handler = new InfluxDbSessionHandler($client, 'testdb');
+        $this->assertTrue($handler->open('', 'test'));
     }
 
-    // Tests for read() method
-    public function testReadSessionData()
+    public function testClose()
     {
-        $expectedResult = 'testData';
-
-        // Ensure test data is written
-        $this->handler->write('testid', $expectedResult);
-
-        $actualResult = $this->handler->read('testid');
-
-        $this->assertEquals($expectedResult, $actualResult);
+        $client = $this->createMock(\InfluxDB\Client::class);
+        $handler = new InfluxDbSessionHandler($client, 'testdb');
+        $this->assertTrue($handler->close());
     }
 
-    // Tests for write() method
-    public function testSessionDataWritten()
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function testCreate_sid()
     {
-        $data = [
-            'mydata' => 'something',
-            'another' => 'value'
-        ];
-
-        $result = $this->handler->write('testid', $data);
-        $this->assertTrue($result);
+        $client = $this->createMock(\InfluxDB\Client::class);
+        $handler = new InfluxDbSessionHandler($client, 'testdb');
+        $sid = $handler->create_sid();
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{32}$/', $sid);
     }
 
-    // Tests for close() method
-    public function testCanCloseSession()
+    public function testValidateId()
     {
-        $result = $this->handler->close();
-
-        $this->assertTrue($result);
-    }
-
-    // Tests for destroy() method
-    public function testCanDestroySession()
-    {
-        $result = $this->handler->destroy('testid');
-
-        $this->assertTrue($result);
-    }
-
-    // Tests for gc() method
-    public function testCanRunGarbageCollection()
-    {
-        $result = $this->handler->gc(3600);
-
-        $this->assertTrue($result);
+        $client = $this->createMock(\InfluxDB\Client::class);
+        $handler = new InfluxDbSessionHandler($client, 'testdb');
+        $sid = $handler->create_sid();
+        $this->assertTrue($handler->validateId($sid));
+        $this->assertFalse($handler->validateId('invalid-session-id'));
     }
 }

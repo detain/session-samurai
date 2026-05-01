@@ -27,7 +27,7 @@
         "friendsofphp/php-cs-fixer": "*",
         "phpstan/extension-installer": "*",
         "phpstan/phpstan": "*",
-        "phpunit/phpunit": ">=6.0,<9@stable",
+        "phpunit/phpunit": ">=9.0,<11@stable",
         "squizlabs/php_codesniffer": "*"
     },
     "autoload": {

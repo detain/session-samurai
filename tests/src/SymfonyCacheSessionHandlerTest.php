@@ -9,15 +9,8 @@ use Detain\SessionSamurai\SymfonyCacheSessionHandler;
 
 class SymfonyCacheSessionHandlerTest extends TestCase
 {
-    /**
-     * @var CacheItemPoolInterface
-     */
-    private $cache;
-
-    /**
-     * @var SymfonyCacheSessionHandler
-     */
-    private $handler;
+    private CacheItemPoolInterface $cache;
+    private SymfonyCacheSessionHandler $handler;
 
     public function setUp(): void
     {
@@ -43,7 +36,7 @@ class SymfonyCacheSessionHandlerTest extends TestCase
         $cacheItem = $this->createMock(CacheItemInterface::class);
         $cacheItem->method('isHit')->willReturn(true);
         $cacheItem->method('get')->willReturn($sessionData);
-        $this->cache->method('getItem')->with($sessionId)->willReturn($cacheItem);
+        $this->cache->method('getItem')->willReturn($cacheItem);
 
         $this->assertEquals($sessionData, $this->handler->read($sessionId));
     }
@@ -54,7 +47,7 @@ class SymfonyCacheSessionHandlerTest extends TestCase
 
         $cacheItem = $this->createMock(CacheItemInterface::class);
         $cacheItem->method('isHit')->willReturn(false);
-        $this->cache->method('getItem')->with($sessionId)->willReturn($cacheItem);
+        $this->cache->method('getItem')->willReturn($cacheItem);
 
         $this->assertEquals('', $this->handler->read($sessionId));
     }
@@ -65,28 +58,23 @@ class SymfonyCacheSessionHandlerTest extends TestCase
         $sessionData = 'bar';
 
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->method('set')->with($sessionData)->willReturn($cacheItem);
-        $cacheItem->method('expiresAfter')->with(123)->willReturn($cacheItem);
-        $this->cache->method('getItem')->with($sessionId)->willReturn($cacheItem);
-        $this->cache->method('save')->with($cacheItem)->willReturn(true);
+        $cacheItem->method('set')->willReturn($cacheItem);
+        $cacheItem->method('expiresAfter')->willReturn($cacheItem);
+        $this->cache->method('getItem')->willReturn($cacheItem);
+        $this->cache->method('save')->willReturn(true);
 
         $this->assertTrue($this->handler->write($sessionId, $sessionData));
     }
 
     public function testDestroy()
     {
-        $sessionId = 'foo';
-
-        $this->cache->method('deleteItem')->with($sessionId)->willReturn(true);
-
-        $this->assertTrue($this->handler->destroy($sessionId));
+        $this->cache->method('deleteItem')->willReturn(true);
+        $this->assertTrue($this->handler->destroy('foo'));
     }
 
     public function testGc()
     {
-        $maxlifetime = 123;
-
-        $this->assertTrue($this->handler->gc($maxlifetime));
+        $this->assertNotFalse($this->handler->gc(123));
     }
 
     public function testCreateSid()
@@ -101,11 +89,20 @@ class SymfonyCacheSessionHandlerTest extends TestCase
         $sessionData = 'bar';
 
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->method('set')->with($sessionData)->willReturn($cacheItem);
-        $cacheItem->method('expiresAfter')->with(123)->willReturn($cacheItem);
-        $this->cache->method('getItem')->with($sessionId)->willReturn($cacheItem);
-        $this->cache->method('save')->with($cacheItem)->willReturn(true);
+        $cacheItem->method('set')->willReturn($cacheItem);
+        $cacheItem->method('expiresAfter')->willReturn($cacheItem);
+        $this->cache->method('getItem')->willReturn($cacheItem);
+        $this->cache->method('save')->willReturn(true);
 
         $this->assertTrue($this->handler->updateTimestamp($sessionId, $sessionData));
+    }
+
+    public function testValidateId()
+    {
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem->method('isHit')->willReturn(true);
+        $this->cache->method('getItem')->willReturn($cacheItem);
+
+        $this->assertTrue($this->handler->validateId('foo'));
     }
 }

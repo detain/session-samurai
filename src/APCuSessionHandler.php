@@ -14,7 +14,7 @@ class APCuSessionHandler implements \SessionHandlerInterface, \SessionIdInterfac
     /**
      * {@inheritdoc}
      */
-    public function open($savePath, $sessionName): bool
+    public function open(string $savePath, string $sessionName): bool
     {
         return true;
     }
@@ -30,57 +30,60 @@ class APCuSessionHandler implements \SessionHandlerInterface, \SessionIdInterfac
     /**
      * {@inheritdoc}
      */
-    public function read($sessionId)
+    public function read(string $sessionId): string
     {
-        return \apcu_fetch($sessionId);
+        $value = \apcu_fetch($sessionId);
+        return is_string($value) ? $value : '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($sessionId, $sessionData): bool
+    public function write(string $sessionId, string $sessionData): bool
     {
-        return \apcu_store($sessionId, $sessionData, $this->ttl);
+        return (bool) \apcu_store($sessionId, $sessionData, $this->ttl);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function destroy($sessionId): bool
+    public function destroy(string $sessionId): bool
     {
-        return \apcu_delete($sessionId);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function gc($maxLifetime)
-    {
+        \apcu_delete($sessionId);
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function gc(int $maxLifetime): int|false
+    {
+        return 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    /**
-     * {@inheritdoc}
-     */
-    public function create_sid()
+    public function create_sid(): string
     {
-        return bin2hex(random_bytes(16));
+        return bin2hex(random_bytes(32));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validateId($sessionId)
+    public function validateId(string $sessionId): bool
     {
-        return (bool) preg_match('/^[0-9a-f]{32}$/', $sessionId);
+        return (bool) preg_match('/^[0-9a-f]{64}$/', $sessionId);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateTimestamp($sessionId, $sessionData)
+    public function updateTimestamp(string $sessionId, string $sessionData): bool
     {
+        \apcu_store($sessionId, $sessionData, $this->ttl);
         return true;
     }
 }

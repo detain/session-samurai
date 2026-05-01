@@ -2,25 +2,23 @@
 
 namespace Detain\SessionSamurai;
 
-class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
+class MysqliSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    protected $db;
+    protected \mysqli $db;
 
     public function __construct(\mysqli &$db)
     {
         $this->db = &$db;
     }
 
-    //open a connection to the session storage
     /**
      * {@inheritdoc}
      */
-    public function open($save_path, $name)
+    public function open(string $save_path, string $name): bool
     {
         return true;
     }
 
-    //close the connection to the session storage
     /**
      * {@inheritdoc}
      */
@@ -29,73 +27,112 @@ class MysqliSessionHandler implements SessionHandlerInterface, SessionIdInterfac
         return true;
     }
 
-    //read the session data for this session
     /**
      * {@inheritdoc}
      */
-    public function read($sid)
+    public function read(string $sid): string
     {
-        $select_statement = $this->db->prepare("SELECT data FROM sessions WHERE sid=?");
-        $select_statement->bind_param('s', $sid);
-        $select_statement->execute();
-        $select_statement->bind_result($data);
-        $select_statement->fetch();
-
-        return $data;
-    }
-
-    //write the session data to the session storage
-    /**
-     * {@inheritdoc}
-     */
-    public function write($sid, $data)
-    {
-        $update_statement = $this->db->prepare("UPDATE sessions SET data=?, timestamp=UNIX_TIMESTAMP() WHERE sid=?");
-        $update_statement->bind_param('ss', $data, $sid);
-        $update_statement->execute();
-
-        if ($update_statement->affected_rows > 0) {
-            return true;
-        } else {
-            $insert_statement = $this->db->prepare("INSERT INTO sessions (sid, data) VALUES (?, ?)");
-            $insert_statement->bind_param('ss', $sid, $data);
-            $insert_statement->execute();
-            return $insert_statement->affected_rows > 0;
+        $stmt = $this->db->prepare("SELECT data FROM sessions WHERE sid=?");
+        if ($stmt === false) {
+            return '';
         }
+        $stmt->bind_param('s', $sid);
+        $stmt->execute();
+        $data = '';
+        $stmt->bind_result($data);
+        $stmt->fetch();
+        return is_string($data) ? $data : '';
     }
 
-    //destroy the session data from the session storage
     /**
      * {@inheritdoc}
      */
-    public function destroy($sid)
+    public function write(string $sid, string $data): bool
     {
-        $delete_statement = $this->db->prepare("DELETE FROM sessions WHERE sid=?");
-        $delete_statement->bind_param('s', $sid);
-        $delete_statement->execute();
-        return $delete_statement->affected_rows > 0;
+        $stmt = $this->db->prepare("UPDATE sessions SET data=?, timestamp=UNIX_TIMESTAMP() WHERE sid=?");
+        if ($stmt === false) {
+            return false;
+        }
+        $stmt->bind_param('ss', $data, $sid);
+        $stmt->execute();
+
+        if ($stmt->affected_rows > 0) {
+            return true;
+        }
+
+        $insert = $this->db->prepare("INSERT INTO sessions (sid, data) VALUES (?, ?)");
+        if ($insert === false) {
+            return false;
+        }
+        $insert->bind_param('ss', $sid, $data);
+        $insert->execute();
+        return $insert->affected_rows > 0;
     }
 
-    //Garbage collection of expired sessions from the session storage
     /**
      * {@inheritdoc}
      */
-    public function gc($maxLifeTime)
+    public function destroy(string $sid): bool
+    {
+        $stmt = $this->db->prepare("DELETE FROM sessions WHERE sid=?");
+        if ($stmt === false) {
+            return false;
+        }
+        $stmt->bind_param('s', $sid);
+        $stmt->execute();
+        return $stmt->affected_rows >= 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function gc(int $maxLifeTime): int|false
     {
         $timestamp = time() - $maxLifeTime;
-        $delete_statement = $this->db->prepare("DELETE FROM sessions WHERE timestamp < ?");
-        $delete_statement->bind_param('i', $timestamp);
-        $delete_statement->execute();
-        return $delete_statement->affected_rows;
+        $stmt = $this->db->prepare("DELETE FROM sessions WHERE timestamp < ?");
+        if ($stmt === false) {
+            return false;
+        }
+        $stmt->bind_param('i', $timestamp);
+        $stmt->execute();
+        return (int) $stmt->affected_rows;
     }
 
-    //Generate a new Session ID
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     /**
      * {@inheritdoc}
      */
-    public function create_sid()
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid(): string
     {
         return bin2hex(random_bytes(32));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateId(string $id): bool
+    {
+        $stmt = $this->db->prepare("SELECT sid FROM sessions WHERE sid=?");
+        if ($stmt === false) {
+            return false;
+        }
+        $stmt->bind_param('s', $id);
+        $stmt->execute();
+        $stmt->store_result();
+        return $stmt->num_rows > 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateTimestamp(string $id, string $data): bool
+    {
+        $stmt = $this->db->prepare("UPDATE sessions SET timestamp=UNIX_TIMESTAMP() WHERE sid=?");
+        if ($stmt === false) {
+            return false;
+        }
+        $stmt->bind_param('s', $id);
+        $stmt->execute();
+        return true;
     }
 }

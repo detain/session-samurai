@@ -5,44 +5,44 @@ namespace Detain\SessionSamuraiTest;
 use PHPUnit\Framework\TestCase;
 use Detain\SessionSamurai\ApcSessionHandler;
 
+/**
+ * @requires extension apc
+ */
 class APCSessionHandlerTest extends TestCase
 {
+    private ApcSessionHandler $handler;
+
+    public function setUp(): void
+    {
+        $this->handler = new ApcSessionHandler();
+        $this->handler->open('test_session', 'test_save_path');
+    }
+
     public function testOpen(): void
     {
-        $APCSession = new APCSessionHandler();
-
-        $this->assertTrue($APCSession->open('test_session', 'test_save_path'));
-    }
-
-    public function testRead(): void
-    {
-        $APCSession = new APCSessionHandler();
-        $APCSession->open('test_session', 'test_save_path');
-
-        $this->assertEquals('value', $APCSession->read('key'));
-    }
-
-    public function testWrite(): void
-    {
-        $APCSession = new APCSessionHandler();
-        $APCSession->open('test_session', 'test_save_path');
-
-        $this->assertTrue($APCSession->write('key', 'value'));
-    }
-
-    public function testDestroy(): void
-    {
-        $APCSession = new APCSessionHandler();
-        $APCSession->open('test_session', 'test_save_path');
-
-        $this->assertTrue($APCSession->destroy('key'));
+        $this->assertTrue($this->handler->open('test_session', 'test_save_path'));
     }
 
     public function testClose(): void
     {
-        $APCSession = new APCSessionHandler();
-        $APCSession->open('test_session', 'test_save_path');
+        $this->assertTrue($this->handler->close());
+    }
 
-        $this->assertEquals(true, $APCSession->close());
+    public function testWrite(): void
+    {
+        $this->assertTrue($this->handler->write('key', 'value'));
+    }
+
+    public function testRead(): void
+    {
+        $this->handler->write('key', 'value');
+        $this->assertEquals('value', $this->handler->read('key'));
+    }
+
+    public function testDestroy(): void
+    {
+        $this->handler->write('destroykey', 'value');
+        $this->assertTrue($this->handler->destroy('destroykey'));
+        $this->assertSame('', $this->handler->read('destroykey'));
     }
 }

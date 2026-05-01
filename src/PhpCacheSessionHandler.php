@@ -70,21 +70,21 @@ class PhpCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
         return true;
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     /**
      * {@inheritdoc}
      */
-    public function create_sid()
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid(): string
     {
-        return uniqid($this->prefix);
+        return bin2hex(random_bytes(32));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validateId($sessionId)
+    public function validateId(string $sessionId): bool
     {
-        return preg_match('/^[a-zA-Z0-9,\-]{1,128}$/', $sessionId);
+        return (bool) preg_match('/^[a-f0-9]{64}$/', $sessionId);
     }
 
     /**

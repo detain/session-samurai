@@ -25,5 +25,5 @@
     <file>tests</file>
 
     <!-- folders / files to exclude -->
-    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*/vendor/*</exclude-pattern>
 </ruleset>

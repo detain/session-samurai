@@ -7,14 +7,14 @@ class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
     public function __construct()
     {
         if (!extension_loaded('wincache')) {
-            throw new RuntimeException('WinCache extension is not loaded');
+            throw new \RuntimeException('WinCache extension is not loaded');
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function open($save_path, $session_name): bool
+    public function open(string $save_path, string $session_name): bool
     {
         return true;
     }
@@ -30,23 +30,24 @@ class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
     /**
      * {@inheritdoc}
      */
-    public function read($session_id)
+    public function read(string $session_id): string
     {
-        return wincache_ucache_get($session_id);
+        $value = wincache_ucache_get($session_id);
+        return is_string($value) ? $value : '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($session_id, $session_data): bool
+    public function write(string $session_id, string $session_data): bool
     {
-        return wincache_ucache_set($session_id, $session_data, ini_get('session.gc_maxlifetime'));
+        return (bool) wincache_ucache_set($session_id, $session_data, (int) ini_get('session.gc_maxlifetime'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function destroy($session_id): bool
+    public function destroy(string $session_id): bool
     {
         wincache_ucache_delete($session_id);
         return true;
@@ -55,16 +56,16 @@ class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
     /**
      * {@inheritdoc}
      */
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
-        return true;
+        return 0;
     }
 
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     /**
      * {@inheritdoc}
      */
-    public function create_sid()
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid(): string
     {
         return bin2hex(random_bytes(32));
     }
@@ -72,7 +73,7 @@ class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
     /**
      * {@inheritdoc}
      */
-    public function validateId($session_id)
+    public function validateId(string $session_id): bool
     {
         return (bool) preg_match('/^[a-f0-9]{64}$/i', $session_id);
     }
@@ -80,8 +81,8 @@ class WinCacheSessionHandler implements \SessionHandlerInterface, \SessionIdInte
     /**
      * {@inheritdoc}
      */
-    public function updateTimestamp($session_id, $session_data)
+    public function updateTimestamp(string $session_id, string $session_data): bool
     {
-        return true;
+        return (bool) wincache_ucache_set($session_id, $session_data, (int) ini_get('session.gc_maxlifetime'));
     }
 }

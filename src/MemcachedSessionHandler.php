@@ -6,16 +6,9 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
 {
     protected \Memcached $memcached;
     protected string $sessionName;
-    /**
-    * @var string|int|false
-    */
-    protected $expire;
+    protected int $expire = 0;
     protected string $prefix = '';
 
-    /**
-    * Create new memcached session save handler
-    * @param \Memcached $memcached
-    */
     public function __construct(\Memcached $memcached, string $prefix = 'sess-')
     {
         $this->memcached = $memcached;
@@ -23,179 +16,86 @@ class MemcachedSessionHandler implements \SessionHandlerInterface, \SessionIdInt
     }
 
     /**
-    * Open session
-    *
-    * @param string $path
-    * @param string $name
-    * @return boolean
-    */
-    //public function open(string $path, string $name): bool
-    /**
      * {@inheritdoc}
      */
-    public function open($path, $name)
+    public function open(string $path, string $name): bool
     {
-        // Note: session save path is not used
         $this->sessionName = $name;
-        $this->expire = ini_get('session.gc_maxlifetime');
+        $this->expire = (int) ini_get('session.gc_maxlifetime');
         return true;
     }
 
-    /**
-    * Close session
-    *
-    * @return boolean
-    */
     /**
      * {@inheritdoc}
      */
     public function close(): bool
     {
-        // return value should be true for success or false for failure
         return true;
     }
 
     /**
-    * Read session data
-    *
-    * @param string $id
-    * @return string|false
-    */
-    #[\ReturnTypeWillChange]
-    /**
      * {@inheritdoc}
      */
-    public function read($id) //: string|false
-    //public function read(string $id) //: string|false
+    public function read(string $id): string
     {
-        $_SESSION = json_decode($this->memcached->get($this->prefix . $id), true);
-        if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null && $_SESSION !== false) {
-            return session_encode();
+        $data = $this->memcached->get($this->prefix . $id);
+        if ($data === false) {
+            return '';
         }
-        return '';
+        return is_string($data) ? $data : '';
     }
 
     /**
-    * Write session data
-    *
-    * @param string $id
-    * @param string $data
-    * @return boolean
-    */
-    /**
      * {@inheritdoc}
      */
-    public function write($id, $data)
-    //public function write(string $id, string $data): bool
+    public function write(string $id, string $data): bool
     {
-        // note: $data is not used as it has already been serialised by PHP,
-        // so we use $_SESSION which is an unserialised version of $data.
-        return (bool) $this->memcached->set($this->prefix . $id, json_encode($_SESSION), $this->expire);
+        return (bool) $this->memcached->set($this->prefix . $id, $data, $this->expire);
     }
 
     /**
-    * Destroy session
-    *
-    * @param string $id
-    * @return boolean
-    */
-    /**
      * {@inheritdoc}
      */
-    public function destroy($id)
-    //public function destroy(string $id): bool
+    public function destroy(string $id): bool
     {
         return (bool) $this->memcached->delete($this->prefix . $id);
     }
 
     /**
-    * Garbage collect. Memcache handles this with expiration times.
-    *
-    * @param int $maxlifetime
-    * @return int|false true successs false failure?
-    */
-    #[\ReturnTypeWillChange]
-    /**
      * {@inheritdoc}
      */
-    public function gc($max_lifetime) //: int|false
-    //public function gc(int $max_lifetime) //: int|false
+    public function gc(int $max_lifetime): int|false
     {
-        // let memcached handle this with expiration time
         $this->expire = $max_lifetime;
-        return true;
+        return 0;
     }
 
     /**
-    * Creates a new SID
-    *
-    * @return string
-    */
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    /**
      * {@inheritdoc}
      */
-    public function create_sid()
-    //public function create_sid(): string
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid(): string
     {
-        // available since PHP 5.5.1
-        // invoked internally when a new session id is needed
-        // no parameter is needed and return value should be the new session id created
         do {
-            $sessionId = md5(uniqid('', true));
-        } while ($this->memcached->get($this->prefix . $sessionId));
+            $sessionId = bin2hex(random_bytes(32));
+        } while ($this->memcached->get($this->prefix . $sessionId) !== false);
 
         return $sessionId;
     }
 
     /**
-    * Update the session timestamp
-    *
-    * @param string $id
-    * @param string $data
-    * @return bool
-    */
-    /**
      * {@inheritdoc}
      */
-    public function updateTimestamp($id, $data)
-    //public function updateTimestamp(string $id, string $data): bool
+    public function updateTimestamp(string $id, string $data): bool
     {
-        // implements SessionUpdateTimestampHandlerInterface::validateId()
-        // available since PHP 7.0
-        // return value should be true for success or false for failure
-        return (bool) $this->memcached->touch($this->prefix . $id, 0);
+        return (bool) $this->memcached->touch($this->prefix . $id, $this->expire);
     }
 
     /**
-    * Verifies a session id
-    *
-    * @param string $id
-    * @return bool
-    */
-    /**
      * {@inheritdoc}
      */
-    public function validateId($id)
-    //public function validateId(string $id): bool
+    public function validateId(string $id): bool
     {
-        // implements SessionUpdateTimestampHandlerInterface::validateId()
-        // available since PHP 7.0
-        // return value should be true if the session id is valid otherwise false
-        // if false is returned a new session id will be generated by php internally
-        return (bool) $this->idExists($id);
-    }
-
-
-    /**
-    * Checks if a session ID exists in the memcached instance.
-    *
-    * @param string $sessionId The session ID to check
-    *
-    * @return bool
-    */
-    public function idExists($id)
-    {
-        return (bool) $this->memcached->get($this->prefix . $id);
+        return $this->memcached->get($this->prefix . $id) !== false;
     }
 }

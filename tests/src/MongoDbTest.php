@@ -4,84 +4,92 @@ namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
 use Detain\SessionSamurai\MongoDbSessionHandler;
+use MongoDB\Collection;
+use MongoDB\Model\BSONDocument;
+use MongoDB\UpdateResult;
+use MongoDB\DeleteResult;
+use MongoDB\Driver\WriteResult;
 
 class MongoDbTest extends TestCase
 {
-    private $sessionHandler;
+    private MongoDbSessionHandler $sessionHandler;
+    private Collection $collection;
 
     public function setUp(): void
     {
-        $mongoConnection = new MongoClient();
-        $this->sessionHandler = new MongoDBSessionHandler($mongoConnection);
+        $this->collection = $this->createMock(Collection::class);
+        $this->sessionHandler = new MongoDbSessionHandler($this->collection);
     }
 
-    // Test open method
     public function testOpenReturnsTrue()
     {
-        $this->assertTrue(
-            $this->sessionHandler->open('my_save_path', 'my_session_name')
-        );
+        $this->assertTrue($this->sessionHandler->open('', ''));
     }
 
-    // Test close method
     public function testCloseReturnsTrue()
     {
-        $this->assertTrue(
-            $this->sessionHandler->close()
-        );
+        $this->assertTrue($this->sessionHandler->close());
     }
 
-    // Test read method
     public function testReadReturnsData()
     {
         $data = '{foo:bar}';
         $id = $this->sessionHandler->create_sid();
 
-        $this->sessionHandler->write($id, $data);
+        $doc = new BSONDocument(['_id' => $id, 'data' => $data]);
+        $this->collection->method('findOne')->willReturn($doc);
+
         $this->assertEquals($data, $this->sessionHandler->read($id));
     }
 
-    // Test write method
+    public function testReadMissingReturnsEmpty()
+    {
+        $this->collection->method('findOne')->willReturn(null);
+        $this->assertEquals('', $this->sessionHandler->read('nonexistent'));
+    }
+
     public function testWriteReturnsTrue()
     {
-        $data = '{foo:bar}';
+        $updateResult = $this->createMock(UpdateResult::class);
+        $updateResult->method('getUpsertedCount')->willReturn(1);
+        $updateResult->method('getModifiedCount')->willReturn(0);
+        $this->collection->method('updateOne')->willReturn($updateResult);
+
         $id = $this->sessionHandler->create_sid();
-        $this->assertTrue($this->sessionHandler->write($id, $data));
-        $this->assertEquals($data, $this->sessionHandler->read($id));
+        $this->assertTrue($this->sessionHandler->write($id, '{foo:bar}'));
     }
 
-    // Test destroy method
     public function testDestroyReturnsTrue()
     {
-        $data = '{foo:bar}';
-        $id = $this->sessionHandler->create_sid();
+        $deleteResult = $this->createMock(DeleteResult::class);
+        $deleteResult->method('getDeletedCount')->willReturn(1);
+        $this->collection->method('deleteOne')->willReturn($deleteResult);
 
-        $this->sessionHandler->write($id, $data);
+        $id = $this->sessionHandler->create_sid();
         $this->assertTrue($this->sessionHandler->destroy($id));
-        $this->assertEquals('', $this->sessionHandler->read($id));
     }
 
-    // Test create_sid method
     public function testCreateSidReturnsString()
     {
-        $this->assertTrue(is_string($this->sessionHandler->create_sid()));
+        $sid = $this->sessionHandler->create_sid();
+        $this->assertIsString($sid);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $sid);
     }
 
-    // Test validateId method
     public function testValidateIdReturnsBoolean()
     {
-        $data = '{foo:bar}';
+        $this->collection->method('countDocuments')->willReturn(1);
         $id = $this->sessionHandler->create_sid();
-        $this->sessionHandler->write($id, $data);
-        $this->assertTrue(is_bool($this->sessionHandler->validateId($id)));
+        $this->assertIsBool($this->sessionHandler->validateId($id));
     }
 
-    // Test updateTimestamp method
     public function testUpdateTimestampReturnsBoolean()
     {
-        $data = '{foo:bar}';
+        $updateResult = $this->createMock(UpdateResult::class);
+        $updateResult->method('getModifiedCount')->willReturn(1);
+        $this->collection->method('updateOne')->willReturn($updateResult);
+
         $id = $this->sessionHandler->create_sid();
-        $this->sessionHandler->write($id, $data);
-        $this->assertTrue(is_bool($this->sessionHandler->updateTimestamp($id, time())));
+        $this->assertIsBool($this->sessionHandler->updateTimestamp($id, 'data'));
     }
 }

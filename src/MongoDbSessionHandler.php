@@ -2,21 +2,22 @@
 
 namespace Detain\SessionSamurai;
 
+use MongoDB\Collection;
+use MongoDB\BSON\UTCDateTime;
+
 class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
-    protected $mongoConnection;
-    protected $sessionCollection;
+    protected Collection $sessionCollection;
 
-    public function __construct($mongoConnection)
+    public function __construct(Collection $sessionCollection)
     {
-        $this->mongoConnection = $mongoConnection;
-        $this->sessionCollection = new MongoCollection($this->mongoConnection, "sessions");
+        $this->sessionCollection = $sessionCollection;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function open($savePath, $sessionName): bool
+    public function open(string $savePath, string $sessionName): bool
     {
         return true;
     }
@@ -32,82 +33,79 @@ class MongoDbSessionHandler implements \SessionHandlerInterface, \SessionIdInter
     /**
      * {@inheritdoc}
      */
-    public function read($id)
+    public function read(string $id): string
     {
-        $cursor = $this->sessionCollection->findOne(['_id' => $id], ['data' => true]);
+        $document = $this->sessionCollection->findOne(['_id' => $id]);
 
-        if ($cursor !== null) {
-            return $cursor['data'];
+        if ($document === null) {
+            return '';
         }
-
-        return '';
+        $docArray = (array) $document;
+        return isset($docArray['data']) && is_string($docArray['data']) ? $docArray['data'] : '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($id, $data)
+    public function write(string $id, string $data): bool
     {
         $options = ['upsert' => true];
         $query = ['_id' => $id];
         $update = [
-            'data' => $data,
-            'updated_at' => new MongoDBTimestamp()
+            '$set' => [
+                'data' => $data,
+                'updated_at' => new UTCDateTime(),
+            ]
         ];
-        $result = $this->sessionCollection->updateOne($query, ['$set' => $update], $options);
-        return $result->getModifiedCount() > 0;
+        $result = $this->sessionCollection->updateOne($query, $update, $options);
+        return $result->getModifiedCount() > 0 || $result->getUpsertedCount() > 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function destroy($id)
+    public function destroy(string $id): bool
     {
-        $options = ['w' => 1];
-        $query = ['_id' => $id];
-        $result = $this->sessionCollection->removeOne($query, $options);
+        $result = $this->sessionCollection->deleteOne(['_id' => $id]);
         return $result->getDeletedCount() > 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function gc($maxlifetime): bool
+    public function gc(int $maxlifetime): int|false
     {
-        return true;
+        $expiry = new UTCDateTime((time() - $maxlifetime) * 1000);
+        $result = $this->sessionCollection->deleteMany(['updated_at' => ['$lt' => $expiry]]);
+        return (int) $result->getDeletedCount();
     }
 
-    // SessionIdInterface
+    /**
+     * {@inheritdoc}
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    /**
-     * {@inheritdoc}
-     */
-    public function create_sid()
+    public function create_sid(): string
     {
-        $sid = base64_encode(openssl_random_pseudo_bytes(20));
-        return preg_replace("/\W/", "", $sid);
-    }
-
-    // SessionUpdateTimestampHandlerInterface
-    /**
-     * {@inheritdoc}
-     */
-    public function validateId($id)
-    {
-        return $this->sessionCollection->count(['_id' => $id]) > 0;
+        return bin2hex(random_bytes(32));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateTimestamp($id, $timestamp)
+    public function validateId(string $id): bool
     {
-        $options = ['upsert' => true];
+        return $this->sessionCollection->countDocuments(['_id' => $id]) > 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateTimestamp(string $id, string $data): bool
+    {
+        $options = ['upsert' => false];
         $query = ['_id' => $id];
-        $update = [
-            'updated_at' => new MongoDBTimestamp()
-        ];
-        $result = $this->sessionCollection->updateOne($query, ['$set' => $update], $opts);
+        $update = ['$set' => ['updated_at' => new UTCDateTime()]];
+        $result = $this->sessionCollection->updateOne($query, $update, $options);
         return $result->getModifiedCount() > 0;
     }
 }

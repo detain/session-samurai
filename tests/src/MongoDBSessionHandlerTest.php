@@ -3,71 +3,64 @@
 namespace Detain\SessionSamuraiTest;
 
 use PHPUnit\Framework\TestCase;
-use MongoDB\Client;
 use Detain\SessionSamurai\MongoDbSessionHandler;
+use MongoDB\Collection;
+use MongoDB\Model\BSONDocument;
+use MongoDB\UpdateResult;
+use MongoDB\DeleteResult;
 
 class MongoDBSessionHandlerTest extends TestCase
 {
-    protected static $sessionHandler;
+    private Collection $collection;
+    private MongoDbSessionHandler $sessionHandler;
 
-    private static $client;
-
-    public static function setUpBeforeClass(): void
+    public function setUp(): void
     {
-        self::$client = new Client();
-
-        self::$sessionHandler = new MongoDBSessionHandler(self::$client);
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        self::$sessionHandler->empty();
+        $this->collection = $this->createMock(Collection::class);
+        $this->sessionHandler = new MongoDbSessionHandler($this->collection);
     }
 
     public function testOpen(): void
     {
-        $this->assertTrue(self::$sessionHandler->open('', ''));
+        $this->assertTrue($this->sessionHandler->open('', ''));
     }
 
     public function testRead(): void
     {
         $sessionId = 'mysessionid';
-        $data = [
-            'foo' => 'bar',
-            'baz' => 'boo'
-        ];
+        $data = '{"foo":"bar"}';
 
-        $this->assertTrue(self::$sessionHandler->write($sessionId, json_encode($data)));
+        $doc = new BSONDocument(['_id' => $sessionId, 'data' => $data]);
+        $this->collection->method('findOne')->willReturn($doc);
 
-        $this->assertEquals(json_encode($data), self::$sessionHandler->read($sessionId));
+        $this->assertEquals($data, $this->sessionHandler->read($sessionId));
     }
 
     public function testWrite(): void
     {
-        $sessionId = 'myothersessionid';
-        $data = [
-            'foo' => 'bar',
-            'baz' => 'boo'
-        ];
+        $updateResult = $this->createMock(UpdateResult::class);
+        $updateResult->method('getUpsertedCount')->willReturn(1);
+        $updateResult->method('getModifiedCount')->willReturn(0);
+        $this->collection->method('updateOne')->willReturn($updateResult);
 
-        $this->assertTrue(self::$sessionHandler->write($sessionId, json_encode($data)));
+        $this->assertTrue($this->sessionHandler->write('myothersessionid', '{"foo":"bar"}'));
     }
 
-    public function testDelete(): void
+    public function testDestroy(): void
     {
-        $sessionId = 'mydeletesessionid';
-        $data = [
-            'foo' => 'bar',
-            'baz' => 'boo'
-        ];
+        $deleteResult = $this->createMock(DeleteResult::class);
+        $deleteResult->method('getDeletedCount')->willReturn(1);
+        $this->collection->method('deleteOne')->willReturn($deleteResult);
 
-        $this->assertTrue(self::$sessionHandler->write($sessionId, json_encode($data)));
-        $this->assertTrue(self::$sessionHandler->destroy($sessionId));
+        $this->assertTrue($this->sessionHandler->destroy('mydeletesessionid'));
     }
 
-    public function testGC(): void
+    public function testGc(): void
     {
-        $expireTime = time() + (1000 * 60);
-        $this->assertTrue(self::$sessionHandler->gc($expireTime));
+        $deleteResult = $this->createMock(DeleteResult::class);
+        $deleteResult->method('getDeletedCount')->willReturn(0);
+        $this->collection->method('deleteMany')->willReturn($deleteResult);
+
+        $this->assertNotFalse($this->sessionHandler->gc(3600));
     }
 }

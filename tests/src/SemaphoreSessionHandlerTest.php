@@ -7,16 +7,18 @@ use Detain\SessionSamurai\SemaphoreSessionHandler;
 
 class SemaphoreSessionHandlerTest extends TestCase
 {
-    private $sessionHandler;
+    private SemaphoreSessionHandler $sessionHandler;
+    private string $sessionId;
 
     public function setUp(): void
     {
         $this->sessionHandler = new SemaphoreSessionHandler();
+        $this->sessionId = $this->sessionHandler->create_sid();
     }
 
     public function testOpen()
     {
-        $this->assertTrue($this->sessionHandler->open('test', 'sess_1'));
+        $this->assertTrue($this->sessionHandler->open('test', 'PHPSESSID'));
     }
 
     public function testClose()
@@ -24,31 +26,39 @@ class SemaphoreSessionHandlerTest extends TestCase
         $this->assertTrue($this->sessionHandler->close());
     }
 
-    public function testRead()
+    public function testReadEmpty()
     {
-        $this->assertNotEmpty($this->sessionHandler->read('test'));
+        $this->assertSame('', $this->sessionHandler->read($this->sessionId));
     }
 
     public function testWrite()
     {
-        $value = 'value';
-        $this->assertTrue($this->sessionHandler->write('test', $value));
-        $this->assertEquals($value, $this->sessionHandler->read('test'));
+        $value = 'hello world';
+        $this->assertTrue($this->sessionHandler->write($this->sessionId, $value));
+        $this->assertEquals($value, $this->sessionHandler->read($this->sessionId));
     }
 
     public function testDestroy()
     {
-        $this->assertTrue($this->sessionHandler->destroy('test'));
-        $this->assertEquals('', $this->sessionHandler->read('test'));
+        $this->sessionHandler->write($this->sessionId, 'data');
+        $this->assertTrue($this->sessionHandler->destroy($this->sessionId));
     }
 
     public function testGc()
     {
-        $this->assertTrue($this->sessionHandler->gc(time()));
+        $this->assertNotFalse($this->sessionHandler->gc(3600));
+    }
+
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function testCreate_sid()
+    {
+        $sid = $this->sessionHandler->create_sid();
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $sid);
     }
 
     public function testUpdateTimestamp()
     {
-        $this->assertTrue($this->sessionHandler->updateTimestamp('test', time()));
+        $this->sessionHandler->write($this->sessionId, 'data');
+        $this->assertTrue($this->sessionHandler->updateTimestamp($this->sessionId, 'data'));
     }
 }

@@ -145,6 +145,15 @@ class DoctrineDBALSessionHandler implements SessionHandlerInterface, SessionIdIn
     /**
      * {@inheritdoc}
      */
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid(): string
+    {
+        return bin2hex(random_bytes(32));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function validateId($sessionId)
     {
         $qb = $this->connection->createQueryBuilder();
